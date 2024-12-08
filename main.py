@@ -75,6 +75,3 @@ def edit_hotels_partialy(
             hotel['title'], hotel['name'] = new_values.get('title', hotel['title']), new_values.get('name', hotel['name'])
             return {'status':'OK'}
     return {'status':'Not Found'}
-
-if __name__ == '__main__' :
-    uvicorn.run('main:app')
