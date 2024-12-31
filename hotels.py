@@ -31,7 +31,10 @@ def function(
             continue
         _hotels.append(hotel)
 
-    return _hotels[per_page*page:per_page*(page+1)]
+    if page and per_page :
+        return _hotels[per_page*page:per_page*(page+1)]
+    
+    return _hotels
 
 @router.delete('/delete/{id_hotel}')
 def delete_hotel(id_hotel: int) :
