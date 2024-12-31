@@ -1,23 +1,27 @@
 from fastapi import Body, Query, APIRouter
-from pydantic import BaseModel
+from schemas.hotels import HotelPATCH, Hotel
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
 hotels = [
-    {'id':1, 'title':'Sochi', 'name':'sochi-hotel'},
-    {'id':2, 'title':'Dubai', 'name':'dubai-hotel'},
+    {"id": 1, "title": "Sochi", "name": "sochi"},
+    {"id": 2, "title": "Дубай", "name": "dubai"},
+    {"id": 3, "title": "Мальдивы", "name": "maldivi"},
+    {"id": 4, "title": "Геленджик", "name": "gelendzhik"},
+    {"id": 5, "title": "Москва", "name": "moscow"},
+    {"id": 6, "title": "Казань", "name": "kazan"},
+    {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
 ]
-
-class Hotel(BaseModel) :
-    title: str
-    name: str
 
 @router.get('')
 def function(
     title: str | None = Query(default=None, description='Город'),
-    name: str | None = Query(default=None, description='Имя отеля'),
-    id: int | None = Query(default=None, description='Идентификатор')
+    id: int | None = Query(default=None, description='Идентификатор'),
+    page: int | None = Query(default=1),
+    per_page: int | None = Query(default=5)
 ) :
+    page -= 1
+    
     _hotels = []
 
     for hotel in hotels:
@@ -25,11 +29,9 @@ def function(
             continue
         if title and hotel['title'] != title :
             continue
-        if name and hotel['name'] != name :
-            continue
         _hotels.append(hotel)
 
-    return _hotels
+    return _hotels[per_page*page:per_page*(page+1)]
 
 @router.delete('/delete/{id_hotel}')
 def delete_hotel(id_hotel: int) :
@@ -51,7 +53,6 @@ def create_hotes(
 
     return {'status':'OK'}
 
-
 @router.put(
     path="/{hotel_id}", 
     summary='Полное изменение данных об отеле', 
@@ -70,16 +71,15 @@ def edit_hotels(hotel_id: int, hotel_data: Hotel) :
            description='<h1>Тут мы частично изменяем данные об отеле</h1>')
 def edit_hotels_partialy(
     hotel_id: int,
-    title: str | None = Body(),
-    name: str | None = Body()
+    hotel_data: HotelPATCH
 ) : 
     new_values = {}
 
-    if title :
-        new_values['title'] = title
+    if hotel_data.title :
+        new_values['title'] = hotel_data.title
     
-    if name :
-        new_values['name'] = name
+    if hotel_data.name :
+        new_values['name'] = hotel_data.name
 
     for hotel in hotels :
         if hotel['id'] == hotel_id :
