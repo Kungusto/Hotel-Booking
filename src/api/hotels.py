@@ -1,5 +1,6 @@
-from fastapi import Body, Query, APIRouter
+from fastapi import Body, Query, APIRouter, Depends
 from schemas.hotels import HotelPATCH, Hotel
+from src.api.dependencies import PaginationDep
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
@@ -14,13 +15,12 @@ hotels = [
 ]
 
 @router.get('')
-def function(
+def get_hotels(
+    pagination: PaginationDep,
     title: str | None = Query(default=None, description='Город'),
     id: int | None = Query(default=None, description='Идентификатор'),
-    page: int | None = Query(default=1),
-    per_page: int | None = Query(default=5)
 ) :
-    page -= 1
+    pagination.page -= 1
     
     _hotels = []
 
@@ -31,8 +31,8 @@ def function(
             continue
         _hotels.append(hotel)
 
-    if page and per_page :
-        return _hotels[per_page*page:per_page*(page+1)]
+    if pagination.page and pagination.per_page :
+        return _hotels[pagination.per_page*pagination.page:pagination.per_page*(pagination.page+1)]
     
     return _hotels
 
@@ -46,7 +46,10 @@ def delete_hotel(id_hotel: int) :
 
 @router.post('')
 def create_hotes(
-    hotel_data: Hotel
+    hotel_data: Hotel = Body(openapi_examples={
+        '1':{'summary':'Сочи', 'value':
+            {'title':'Сочи', 'name':'Sochi-hotel'}}
+    })
 ) :
     hotels.append({
         'id' : hotels[-1]['id'] + 1,
