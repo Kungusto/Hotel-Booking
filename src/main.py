@@ -11,7 +11,9 @@ import uvicorn
 
 from src.config import settings
 
-print(settings.DB_URL)
+
+from src.database import *
+ 
 
 app = FastAPI()
 
