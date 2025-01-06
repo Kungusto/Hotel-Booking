@@ -1,13 +1,20 @@
+## импорты FastAPI
 from fastapi import Body, Query, APIRouter, Depends
 
+## src импорты!
 from src.schemas.hotels import HotelPATCH, Hotel
 from src.api.dependencies import PaginationDep
 
-# импорт orm
+### репозитории
+from src.repositories.hotels import HotelsRepository
+from src.repositories.rooms import RoomsRepository
+
+### импорт orm
 from src.database import async_session_maker
 from src.models.hotels import HotelsOrm
 
-from sqlalchemy import *
+## импорты алхимии
+from sqlalchemy import select, insert
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
@@ -21,30 +28,9 @@ async def get_hotels(
 ) :
     
     async with async_session_maker() as session :
-        query = select(HotelsOrm)
-        
-        if title :
-            query = query.filter(HotelsOrm.title.like(f'%{title}%')) 
-        if location :
-            query = query.filter(HotelsOrm.location.like(f'%{location}%'))
-            
-        query = (
-                query.
-                limit(pagination.per_page).
-                offset(pagination.per_page * (pagination.page - 1))
-        )
-
-        
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        
-        return hotels
-
-
-        # if pagination.page and pagination.per_page :
-        #     return _hotels[pagination.per_page*pagination.page:pagination.per_page*(pagination.page+1)]
-        
-        
+        return await HotelsRepository(session).get_all(location=location, title=title, 
+                                                       limit=pagination.per_page, 
+                                                       offset=pagination.per_page * (pagination.page - 1))
 
 @router.delete('/delete/{id_hotel}')
 def delete_hotel(id_hotel: int) :
@@ -64,11 +50,10 @@ async def create_hotels(
     })
 ) :
     async with async_session_maker() as session :
-        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        await session.execute(add_hotel_stmt)
+        hotel = await HotelsRepository(session).add(hotel_data=hotel_data)
         await session.commit() 
 
-    return {'status':'OK'}
+    return {'status':'OK', 'data':hotel}
 
 @router.put(
     path="/{hotel_id}", 
