@@ -33,12 +33,18 @@ async def get_hotels(
                                                        offset=pagination.per_page * (pagination.page - 1))
 
 @router.delete('/delete/{id_hotel}')
-def delete_hotel(id_hotel: int) :
-    for index, hotel in enumerate(hotels) :    
-        if hotel['id'] == id_hotel :
-            del hotels[index]
-            return {'status':'OK'}
-    return {'status':'Not Found'}
+async def delete_hotel(id_hotel: int) :
+    filters = {'id':id_hotel}
+    
+    async with async_session_maker() as session :
+        try :
+            async with async_session_maker() as session :
+                await HotelsRepository(session).delete(**filters)  
+                await session.commit()
+                return {'status':'OK'} 
+        except Exception as e:
+            print(e)
+            return {'status':'Not Found'}
 
 @router.post('')
 async def create_hotels(
@@ -59,14 +65,18 @@ async def create_hotels(
     path="/{hotel_id}", 
     summary='Полное изменение данных об отеле', 
     description='Тут мы изменяем данные об отеле')
-def edit_hotels(hotel_id: int, hotel_data: Hotel) : 
-    print(f'id: {hotel_id}')
-    for hotel in hotels :
-        print(hotel['id'], hotel_id)
-        if hotel['id'] == hotel_id :
-            hotel['title'], hotel['name'] = hotel_data.title, hotel_data.name
+async def edit_hotels(hotel_id: int, hotel_data: Hotel) : 
+    
+    filters = {'id':hotel_id}
+
+    try :
+        async with async_session_maker() as session :
+            await HotelsRepository(session).edit(hotel_data, **filters)
+            await session.commit()
             return {'status':'OK'}
-    return {'status':'Not Found'}
+    except Exception as e:
+        print(e)
+        return {'status':'Not Found'}
 
 @router.patch(path="/{hotel_id}", 
            summary='Частичное изменение данных об отеле', 
