@@ -20,6 +20,15 @@ router = APIRouter(prefix='/hotels', tags=['Отели'])
 
 hotels = {}
 
+
+@router.get(
+    path='/{hotel_id}',
+    description='<h1>Получаем отель по id<h1>',
+    summary='Получение отеля по id')
+async def get_hotel(hotel_id: int) :
+    async with async_session_maker() as session :
+        return await HotelsRepository(session).get_all_by_id(hotel_id=hotel_id)
+
 @router.get('')
 async def get_hotels(
     pagination: PaginationDep,
@@ -81,21 +90,17 @@ async def edit_hotels(hotel_id: int, hotel_data: Hotel) :
 @router.patch(path="/{hotel_id}", 
            summary='Частичное изменение данных об отеле', 
            description='<h1>Тут мы частично изменяем данные об отеле</h1>')
-def edit_hotels_partialy(
+async def edit_hotels_partialy(
     hotel_id: int,
     hotel_data: HotelPATCH
 ) : 
-    new_values = {}
-
-    if hotel_data.title :
-        new_values['title'] = hotel_data.title
-    
-    if hotel_data.name :
-        new_values['name'] = hotel_data.name
-
-    for hotel in hotels :
-        if hotel['id'] == hotel_id :
-            hotel['title'], hotel['name'] = new_values.get('title', hotel['title']), new_values.get('name', hotel['name'])
+    print('ыыыыы')
+    try :
+        async with async_session_maker() as session :
+            await HotelsRepository(session).edit(hotel_data, exclude_unset=True, id=hotel_id)
+            await session.commit()
             return {'status':'OK'}
-    return {'status':'Not Found'}
+    except Exception as e:
+        print(e)
+        return {'status':'Not Found'} 
 
