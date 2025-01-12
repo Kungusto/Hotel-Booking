@@ -7,6 +7,7 @@ from src.services.auth import AuthService
 
 # схемы
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
+from api.dependencies import UserIdDep
 
 # репозитории
 from src.repositories.users import UsersRepository
@@ -49,16 +50,21 @@ async def login_user(
         
         acces_token = AuthService().create_access_token({'user_id':user.id})
         response.set_cookie(key='access_token', value=acces_token)
+        
         return {'acces_token' : acces_token}
 
-@router.get('/only_auth')
-async def only_auth(
-    request: Request
+@router.get('/me')
+async def get_me(
+    data: UserIdDep
 ) :
-    cookies = request.cookies
+    async with async_session_maker() as session : 
+        user = await UsersRepository(session).get_one_or_none(id=data['user_id'])
+        return user
+
+@router.delete('/logout')
+async def logout_user(
+    response: Response
+) :
+    response.delete_cookie('access_token')
     
-    access_token = cookies.get('access_token', None)
-    
-    print(access_token)
-    
-    return {'access_token':access_token}
+    return {'status':'OK'}
