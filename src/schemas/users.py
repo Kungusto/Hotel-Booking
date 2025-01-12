@@ -18,3 +18,9 @@ class User(BaseModel) :
     nickname: str
     email: EmailStr
 
+class UserLogin(BaseModel) :
+    email: EmailStr
+    password: str
+
+class UserWithHashedPassword(User) :
+    hashedpassword: str

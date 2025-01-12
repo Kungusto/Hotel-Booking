@@ -19,8 +19,8 @@ from src.database import *
 
 app = FastAPI()
 
-app.include_router(router_hotels)
 app.include_router(router_auth)
+app.include_router(router_hotels)
 
 if __name__ == '__main__' :
     uvicorn.run(app)
