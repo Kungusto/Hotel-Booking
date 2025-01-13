@@ -64,7 +64,7 @@ async def create_hotels(
     })
 ) :
     async with async_session_maker() as session :
-        hotel = await HotelsRepository(session).add(hotel_data=hotel_data)
+        hotel = await HotelsRepository(session).add(data=hotel_data)
         await session.commit() 
 
     return {'status':'OK', 'data':hotel}

@@ -61,7 +61,7 @@ async def get_me(
         user = await UsersRepository(session).get_one_or_none(id=data['user_id'])
         return user
 
-@router.delete('/logout')
+@router.post('/logout')
 async def logout_user(
     response: Response
 ) :

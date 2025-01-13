@@ -1,7 +1,9 @@
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
+from src.schemas.rooms import Room
 
 class RoomsRepository(BaseRepository) :
-    models = RoomsOrm
+    model = RoomsOrm
+    schema = Room
     
     

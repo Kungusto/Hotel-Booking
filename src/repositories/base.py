@@ -29,8 +29,10 @@ class BaseRepository :
             return  self.schema.model_validate(model, from_attributes=True)
                 
     
-    async def add(self, hotel_data) : 
-        add_hotel_stmt = insert(self.model).values(**hotel_data.model_dump()).returning(self.model)
+    async def add(self, data) : 
+        print(self.model)
+        print(type(self))
+        add_hotel_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         result = await self.session.execute(add_hotel_stmt)
         model = result.scalars().first()
         return  self.schema.model_validate(model, from_attributes=True)
