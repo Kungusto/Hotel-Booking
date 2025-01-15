@@ -1,5 +1,5 @@
 # импорт библиотек
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Query
 
 # база данныз и подключение к ней
 from src.database import async_session_maker
@@ -34,12 +34,20 @@ async def create_room(
     return {'status':'OK', 'data':data}
 
 @router.get('{hotel_id}/{room_id}')
-async def get_room(
+async def get_room_by_id(
     hotel_id: int,
     room_id: int
 ) :
     async with async_session_maker() as session :
-        get_room_stmt = await RoomsRepository(session).get_one_or_none(id=room_id)
+        get_room_stmt = await RoomsRepository(session).get_one_or_none(id=room_id, hotel_id=hotel_id)
     
     return get_room_stmt
         
+@router.get('/rooms')
+async def get_rooms(
+    price: int | None = Query(default=None, description='Цена за сутки'),
+    quantity: int | None = Query(default=None, description='Вместимость номера')
+) : 
+    async with async_session_maker() as session : 
+        RoomsRepository(session).get_all()    
+    

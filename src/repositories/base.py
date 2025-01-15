@@ -30,8 +30,6 @@ class BaseRepository :
                 
     
     async def add(self, data) : 
-        print(self.model)
-        print(type(self))
         add_hotel_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         result = await self.session.execute(add_hotel_stmt)
         model = result.scalars().first()
