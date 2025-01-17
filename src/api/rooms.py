@@ -45,9 +45,15 @@ async def get_room_by_id(
         
 @router.get('/rooms')
 async def get_rooms(
-    price: int | None = Query(default=None, description='Цена за сутки'),
-    quantity: int | None = Query(default=None, description='Вместимость номера')
+    hotel_id,
+    title: str | None = Query(default=None, description='Название номера'),
+    price : int | None = Query(default=None, description='Цена'),
+    quentity : int | None = Query(default=None, description='Вместимость номера')
 ) : 
     async with async_session_maker() as session : 
-        RoomsRepository(session).get_all()    
+        RoomsRepository(session).get_all(
+            title=title,
+            price=price, 
+            quentity=quentity
+        )   
     
