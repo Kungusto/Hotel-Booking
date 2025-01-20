@@ -8,7 +8,7 @@ from src.database import async_session_maker
 from src.repositories.rooms import RoomsRepository
 
 # схемы
-from src.schemas.rooms import Room
+from src.schemas.rooms import Room, PATCHRoom
 
 router = APIRouter(prefix='/hotels', tags=['Номера'])
 
@@ -60,3 +60,40 @@ async def get_rooms(
         
     return query
     
+@router.patch('/{hotel_id}/{room_id}')
+async def patch_hotel(
+    room_id: int,
+    data: PATCHRoom
+) : 
+    async with async_session_maker() as session : 
+        await RoomsRepository(session).edit(data, is_patch=True, id=room_id)
+        await session.commit()
+        
+    return {'status':'OK'}
+        
+@router.put('/{hotel_id}/{room_id}')
+async def put_room(
+    hotel_id: int,
+    room_id: int,
+    data: PATCHRoom
+) : 
+    async with async_session_maker() as session : 
+        await RoomsRepository(session).edit(
+            data,
+            is_patch=False,
+            id=room_id, 
+            hotel_id=hotel_id)
+        await session.commit()
+        
+    return {'status':'OK'}
+
+@router.delete('/{hotel_id}/{room_id}')
+async def delete_room(
+    hotel_id: int,
+    room_id: int
+) :
+    async with async_session_maker() as session :
+        await RoomsRepository(session).delete(id=room_id, hotel_id=hotel_id)
+        await session.commit()
+    
+    return {'status':'OK'}

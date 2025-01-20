@@ -36,7 +36,8 @@ class BaseRepository :
         return  self.schema.model_validate(model, from_attributes=True)
 
     async def edit(self, data, is_patch=False, **filter_by) -> None : 
-        edit_hotel_stmt = update(self.model).filter_by(**filter_by).values(**data.model_dump(exclude_unset=is_patch))
+        edit_hotel_stmt = (update(self.model).filter_by(**filter_by).
+        values(**data.model_dump(exclude_unset=is_patch)))
         await self.session.execute(edit_hotel_stmt)
          
     async def delete(self, **filter_by) -> None : 
