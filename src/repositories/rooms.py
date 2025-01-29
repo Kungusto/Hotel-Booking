@@ -11,7 +11,7 @@ class RoomsRepository(BaseRepository) :
     async def get_all(self, hotel_id, title, price, quantity) : 
         get_rooms_stmt = select(RoomsOrm)
 
-        print(quantity)
+        print(hotel_id, title, price, quantity)
             
         if hotel_id : 
             get_rooms_stmt = get_rooms_stmt.filter_by(hotel_id=hotel_id)

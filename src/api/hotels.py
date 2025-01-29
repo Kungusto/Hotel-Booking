@@ -4,6 +4,7 @@ from fastapi import Body, Query, APIRouter, Depends
 ## src импорты!
 from src.schemas.hotels import HotelPATCH, Hotel, HotelAdd
 from src.api.dependencies import PaginationDep
+from src.api.dependencies import DBDep
 
 ### репозитории
 from src.repositories.hotels import HotelsRepository
@@ -32,11 +33,11 @@ async def get_hotel(hotel_id: int) :
 @router.get('')
 async def get_hotels(
     pagination: PaginationDep,
+    db: DBDep, 
     title: str | None = Query(default=None, description='Город'),
     location: str | None = Query(default=None, description='Адрес'),
 ) :
-    async with async_session_maker() as session :
-        return await HotelsRepository(session).get_all(location=location, title=title, 
+    return await db.hotels.get_all(location=location, title=title, 
                                                        limit=pagination.per_page, 
                                                        offset=pagination.per_page * (pagination.page - 1))
 
