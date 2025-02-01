@@ -31,4 +31,4 @@ class HotelsRepository(BaseRepository) :
         result = await self.session.execute(query)
         
         return  [self.schema.model_validate(hotel, from_attributes=True) for hotel in result.scalars().all()]
-        
+    
