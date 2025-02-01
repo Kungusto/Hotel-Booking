@@ -16,3 +16,4 @@ class BookingsOrm(Base) :
     date_from : Mapped[date] = mapped_column(Date, default=lambda: date.today())
     date_to : Mapped[date] = mapped_column(Date, default=lambda: date.today() + timedelta(days=1))
     price : Mapped[int] = mapped_column(Integer)
+    
