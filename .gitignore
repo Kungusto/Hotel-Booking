@@ -3,4 +3,5 @@ venv
 __pycache__
 .env
 .codegpt
-migrations
+src/migrations
+.venv
