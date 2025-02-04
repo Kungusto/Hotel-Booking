@@ -1,7 +1,11 @@
 venv
+.venv
 .idea 
 __pycache__
 .env
 .codegpt
+i.webp
 src/migrations
-.venv
+env.py
+script.by.mako
+src/alembic.ini
