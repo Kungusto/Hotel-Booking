@@ -37,3 +37,9 @@ async def get_db() :
         yield db
         
 DBDep = Annotated[DBManager, Depends(get_db)]
+
+def get_id_user(token_dict = Depends(get_current_user_id)) :
+    return token_dict['user_id']
+    
+
+GetUserId = Annotated[int, Depends(get_id_user)]
