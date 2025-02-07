@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey, Integer, Date
 from datetime import date, timedelta
 from sqlalchemy.ext.hybrid import hybrid_property
 
-
+from src.database import Base
 
 class BookingsOrm(Base) : 
     __tablename__ = 'bookings'

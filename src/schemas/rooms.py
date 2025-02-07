@@ -23,3 +23,6 @@ class PUTRoom(BaseModel) :
     description: str 
     price: int 
     quantity: int 
+    
+class RoomID(BaseModel) :
+    room_id : int

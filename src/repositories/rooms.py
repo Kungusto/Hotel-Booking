@@ -1,12 +1,15 @@
-from sqlalchemy import select, update, delete, insert
+from sqlalchemy import Engine, func, select, update, delete, insert
 
+from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
-from src.schemas.rooms import Room
+from src.schemas.rooms import Room, RoomID
+
+from database import engine
 
 class RoomsRepository(BaseRepository) :
     model = RoomsOrm
-    schema = Room
+    schema = RoomID
     
     async def get_all(self, hotel_id, title, price, quantity) : 
         get_rooms_stmt = select(RoomsOrm)
@@ -24,10 +27,48 @@ class RoomsRepository(BaseRepository) :
             
         result = await self.session.execute(get_rooms_stmt)    
             
-        print(str(get_rooms_stmt))
-            
         return result.scalars().all()
-        
     
-    
-# id|hotel_id|title             |description|price|quantity|
+    async def get_filtered_by_time(self, hotel_id, date_to, date_from) :
+            rooms_count = (
+                select(BookingsOrm.room_id, func.count('*').label('rooms_booked'))
+                .select_from(BookingsOrm)
+                .filter(
+                    BookingsOrm.date_from <= date_from, 
+                    BookingsOrm.date_to >= date_to
+                )
+                .group_by(BookingsOrm.room_id)
+                .cte(name='rooms_count')
+            )
+
+            rooms_left_table = (
+                select(
+                    RoomsOrm.id.label('room_id'),
+                    (RoomsOrm.id - func.coalesce(rooms_count.c.rooms_booked, 0)).label('rooms_left') 
+                    )
+                .select_from(RoomsOrm) 
+                .outerjoin(rooms_count, RoomsOrm.id == rooms_count.c.room_id)
+                .cte(name='rooms_left_table')
+                )
+            
+            get_rooms_ids_for_hotel = (
+                select(RoomsOrm.id)
+                .select_from(RoomsOrm)
+                .filter_by(hotel_id=hotel_id)
+                .subquery()
+            )
+            
+            rooms_ids_to_get = (
+                select(rooms_left_table.c.room_id)
+                .select_from(rooms_left_table)
+                .filter(
+                    rooms_left_table.c.rooms_left > 0,
+                    rooms_left_table.c.room_id.in_(
+                            get_rooms_ids_for_hotel
+                        )
+                    )
+            )
+            
+            print(rooms_ids_to_get.compile(bind=engine, compile_kwargs={'literal_binds': True}))
+            
+            return await self.get_filtered(RoomsOrm.id.in_(rooms_ids_to_get))
