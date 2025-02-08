@@ -25,4 +25,4 @@ class PUTRoom(BaseModel) :
     quantity: int 
     
 class RoomID(BaseModel) :
-    room_id : int
+    id : int

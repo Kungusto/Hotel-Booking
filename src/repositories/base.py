@@ -1,6 +1,7 @@
 from sqlalchemy import select, insert, update, delete
 
 from src.schemas.hotels import Hotel
+from database import engine
 
 class BaseRepository :
     model = None
@@ -23,7 +24,9 @@ class BaseRepository :
             .filter_by(**filter_by)
         )
         result = await self.session.execute(query)
+        
         return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+         
         
     async def get_one_or_none(self, **filter_by) :
             query = select(self.model).filter_by(**filter_by)

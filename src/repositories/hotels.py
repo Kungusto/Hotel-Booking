@@ -1,34 +1,49 @@
+from datetime import date
 from sqlalchemy import select, insert, func, update, delete
 
 ## Pydantic
+from repositories.utils import rooms_ids_for_booking
 from src.schemas.hotels import Hotel
 
 # ошибки
 from sqlalchemy.exc import NoResultFound
 
+# БД
 from src.repositories.base import BaseRepository
 from src.models.hotels import HotelsOrm
-
+from src.models.rooms import RoomsOrm
 
 class HotelsRepository(BaseRepository) :
     model = HotelsOrm 
     schema = Hotel
-    
-    async def get_all(self, location, title, limit, offset) :
-        query = select(HotelsOrm)
+
+# ---------------------------------------------------- #
+    async def get_filtered_by_time(
+        self, 
+        date_from: date,
+        date_to: date,
+        location: str, 
+        title: str,
+        limit: int = 0, 
+        offset: int = 5
+    ) :
+        filters_by = {}
         
-        if title :
-            query = query.filter(HotelsOrm.title.like(f'%{title}%')) 
-        if location :
-            query = query.filter(HotelsOrm.location.like(f'%{location}%'))
-            
-        query = (
-                query
-                .limit(limit)
-                .offset(offset)
+        if location : 
+            filters_by['location'] = location
+        if title : 
+            filters_by['title'] = title
+        
+        rooms_stmt = rooms_ids_for_booking(
+            date_from=date_from,
+            date_to=date_to)
+        
+        hotels_id_to_get = (
+            select(RoomsOrm.hotel_id)
+            .select_from(RoomsOrm)
+            .filter(RoomsOrm.id.in_(rooms_stmt))
         )
-        
-        result = await self.session.execute(query)
-        
-        return  [self.schema.model_validate(hotel, from_attributes=True) for hotel in result.scalars().all()]
-    
+        return (await self.get_filtered(HotelsOrm.id.in_(hotels_id_to_get),
+                **filters_by
+            ))[offset:offset+limit]
+# ---------------------------------------------------- #

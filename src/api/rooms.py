@@ -36,6 +36,16 @@ async def create_room(
     
     return {'status':'OK', 'data':data}
 
+    
+@router.get('/{hotel_id}/rooms')
+async def get_rooms_by_hotel(
+    db: DBDep, 
+    hotel_id: int,
+    date_from: date = Query(example='2025-02-10'),
+    date_to: date = Query(example='2025-02-17')
+) :
+    return await db.rooms.get_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
+
 @router.get('/{hotel_id}/{room_id}')
 async def get_room_by_id(
     hotel_id: int,
@@ -46,15 +56,6 @@ async def get_room_by_id(
     
     return get_room_stmt
         
-    
-@router.get('{hotel_id}/rooms')
-async def get_rooms_by_hotel(
-    db: DBDep, 
-    hotel_id: int,
-    date_from: date = Query(example='2025-02-10'),
-    date_to: date = Query(example='2025-02-17')
-) :
-    return await db.rooms.get_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
 # @router.get('/rooms')
 # async def get_rooms(
