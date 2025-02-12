@@ -1,15 +1,25 @@
 from pydantic import BaseModel, Field
 
-class Room(BaseModel) : 
+class RoomAddRequest(BaseModel) : 
+    title: str
+    description: str | None = Field(None)
+    price: int
+    quantity: int
+    facilities_ids: list[int] | None = None
+    
+class RoomAdd(BaseModel) : 
     hotel_id: int
     title: str
     description: str | None = Field(None)
     price: int
     quantity: int
 
-class GetRoom(Room) :
+class Room(RoomAdd) :
     id: int
 
+class RoomID(BaseModel) :
+    id : int
+    
 class PATCHRoom(BaseModel) : 
     hotel_id: int | None = Field(None)
     title: str | None = Field(None)
@@ -24,5 +34,3 @@ class PUTRoom(BaseModel) :
     price: int 
     quantity: int 
     
-class RoomID(BaseModel) :
-    id : int

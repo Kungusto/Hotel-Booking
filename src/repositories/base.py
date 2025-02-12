@@ -1,4 +1,5 @@
 from sqlalchemy import select, insert, update, delete
+from pydantic import BaseModel
 
 from src.schemas.hotels import Hotel
 from database import engine
@@ -46,6 +47,10 @@ class BaseRepository :
         result = await self.session.execute(add_hotel_stmt)
         model = result.scalars().first()
         return  self.schema.model_validate(model, from_attributes=True)
+
+    async def add_bulk(self, data: list[BaseModel]) : 
+        add_hotel_stmt = insert(self.model).values([item.model_dump() for item in data])
+        await self.session.execute(add_hotel_stmt)
 
     async def edit(self, data, is_patch=False, **filter_by) -> None : 
         edit_hotel_stmt = (update(self.model).filter_by(**filter_by).

@@ -4,7 +4,7 @@ from repositories.utils import rooms_ids_for_booking
 from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
-from src.schemas.rooms import Room, RoomID
+from src.schemas.rooms import RoomAdd, RoomID, Room
 
 from database import engine
 

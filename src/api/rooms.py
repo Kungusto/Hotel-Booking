@@ -9,7 +9,8 @@ from src.database import async_session_maker
 from src.repositories.rooms import RoomsRepository
 
 # схемы
-from src.schemas.rooms import Room, PATCHRoom
+from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest
+from src.schemas.facilities import RoomsFacilitiesAdd
 
 from api.dependencies import DBDep
 
@@ -17,22 +18,16 @@ router = APIRouter(prefix='/hotels', tags=['Номера'])
 
 @router.post('/create_room')
 async def create_room(
-    data: Room = Body(openapi_examples={
-        '1':{
-            'summary':'3-х местный эконом', 
-            'value': {
-                'hotel_id':1,
-                'title':'3-х местный эконом',
-                'description':None,
-                'price':4500,
-                'quantity':3
-            }
-        }
-    })
+    db: DBDep,
+    hotel_id: int = Query(),
+    data: RoomAddRequest = Body()
 ) : 
-    async with async_session_maker() as session : 
-        query = await RoomsRepository(session).add(data)
-        await session.commit()
+    data_to_add = RoomAdd(hotel_id=hotel_id, **data.model_dump())
+    room_data = await db.rooms.add(data_to_add)
+    
+    dates_for_facilities = [RoomsFacilitiesAdd(room_id=room_data.id, facility_id=id_fclty) for id_fclty in data.facilities_ids]
+    await db.facilities.add_bulk(dates_for_facilities)
+    await db.commit()
     
     return {'status':'OK', 'data':data}
 

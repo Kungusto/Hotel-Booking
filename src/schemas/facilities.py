@@ -7,7 +7,9 @@ class Uslugi(BaseModel) :
 class UslugiAdd(BaseModel) :
     title: str
     
-class RoomsFacilities(BaseModel) :
-    id: int
+class RoomsFacilitiesAdd(BaseModel) :
     room_id: int
     facility_id: int
+    
+class RoomsFacilities(RoomsFacilitiesAdd) : 
+    id: int
