@@ -5,12 +5,14 @@ from src.schemas.facilities import Uslugi
 
 router = APIRouter(prefix='/facilities', tags=['Удобства'])
 
-@router.get('')
-async def get_all_facilites() :
-    ...
+@router.get('/all')
+async def get_all_uslugi(
+    db: DBDep,
+) :
+    return await db.uslugi.get_all()
     
 @router.post('/add')
-async def post_facilities(
+async def post_uslugi(
         db: DBDep,
         data: Uslugi
     ) : 
