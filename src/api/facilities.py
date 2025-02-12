@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from src.api.dependencies import DBDep
 
-from src.schemas.facilities import Uslugi
+from src.schemas.facilities import Uslugi, UslugiAdd
 
 router = APIRouter(prefix='/facilities', tags=['Удобства'])
 
@@ -14,7 +14,7 @@ async def get_all_uslugi(
 @router.post('')
 async def post_uslugi(
         db: DBDep,
-        data: Uslugi
+        data: UslugiAdd
     ) : 
         result = await db.uslugi.add(data=data)
         await db.commit()

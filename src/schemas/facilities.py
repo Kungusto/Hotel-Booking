@@ -4,6 +4,9 @@ class Uslugi(BaseModel) :
     id: int
     title: str 
     
+class UslugiAdd(BaseModel) :
+    title: str
+    
 class RoomsFacilities(BaseModel) :
     id: int
     room_id: int
