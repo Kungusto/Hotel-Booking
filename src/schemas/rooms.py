@@ -26,11 +26,12 @@ class PATCHRoom(BaseModel) :
     description: str | None = Field(None)
     price: int | None = Field(None)
     quantity: int | None = Field(None)
-
+    
 class PUTRoom(BaseModel) :
     hotel_id: int 
     title: str 
     description: str 
     price: int 
     quantity: int 
-    
+    facilities_ids: list[int]
+

@@ -72,12 +72,18 @@ async def get_room_by_id(
 @router.patch('/{hotel_id}/{room_id}')
 async def patch_hotel(
     room_id: int,
-    data: PATCHRoom
+    request: PATCHRoom, 
+    db: DBDep
 ) : 
-    async with async_session_maker() as session : 
-        await RoomsRepository(session).edit(data, is_patch=True, id=room_id)
-        await session.commit()
-        
+    data = RoomAdd(**request.model_dump())
+    await db.rooms.edit(data, is_patch=True, id=room_id)
+    ids_to_delete = set() # idшники на удаление 
+    ids_to_add = set() # idшники на добавление
+    not_sorted_result = await db.facilities.get_filtered(room_id=room_id)
+    all_fclts_ids = [model.facility_id for model in not_sorted_result]
+    print(all_fclts_ids)    
+    
+    # await db.commit() на время тестов без коммитов
     return {'status':'OK'}
         
 @router.put('/{hotel_id}/{room_id}')
