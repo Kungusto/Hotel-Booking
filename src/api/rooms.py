@@ -76,7 +76,7 @@ async def patch_hotel(
     request: PATCHRoom, 
     db: DBDep
 ) : 
-    data = PATCHRoomAdd(**request.model_dump())
+    data = PATCHRoomAdd(**request.model_dump(exclude_unset=True))
     await db.rooms.edit(data, is_patch=True, id=room_id)
     not_sorted_result = await db.facilities.get_filtered(room_id=room_id)
     
@@ -88,7 +88,6 @@ async def patch_hotel(
         RoomsFacilitiesOrm.facility_id.in_(list(ids_to_delete))
         ) # удаляем те, которых нету в новых удобствах
     data_to_add = [RoomsFacilitiesAdd(room_id=room_id, facility_id=fclt_id) for fclt_id in ids_to_add]
-    print(data_to_add)
     if ids_to_add :
         await db.facilities.add_bulk(data_to_add) 
     await db.commit() 
