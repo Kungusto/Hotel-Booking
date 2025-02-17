@@ -26,11 +26,27 @@ class PATCHRoom(BaseModel) :
     description: str | None = Field(None)
     price: int | None = Field(None)
     quantity: int | None = Field(None)
-
+    facilities_ids: list[int] | None = Field(None)
+    
 class PUTRoom(BaseModel) :
     hotel_id: int 
     title: str 
     description: str 
     price: int 
     quantity: int 
+    facilities_ids: list[int]
+
+class PATCHRoomAdd(BaseModel) : 
+    hotel_id: int | None = Field(None)
+    title: str | None = Field(None)
+    description: str | None = Field(None)
+    price: int | None = Field(None)
+    quantity: int | None = Field(None)
     
+class PUTRoomAdd(BaseModel) :
+    hotel_id: int 
+    title: str 
+    description: str 
+    price: int 
+    quantity: int 
+
