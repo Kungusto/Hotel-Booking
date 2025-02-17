@@ -27,6 +27,7 @@ async def create_room(
     
     dates_for_facilities = [RoomsFacilitiesAdd(room_id=room_data.id, facility_id=id_fclty) for id_fclty in data.facilities_ids]
     await db.facilities.add_bulk(dates_for_facilities)
+    
     await db.commit()
     
     return {'status':'OK', 'data':data}
