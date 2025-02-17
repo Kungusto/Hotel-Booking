@@ -54,24 +54,24 @@ async def get_room_by_id(
     return get_room_stmt
         
 
-# @router.get('/rooms')
-# async def get_rooms(
-#     hotel_id: int = Query(description='Идентификатор отеля'),
-#     title: str | None = Query(default=None, description='Название номера'),
-#     price : int | None = Query(default=None, description='Цена'),
-#     quantity : int | None = Query(default=None, description='Вместимость номера')
-# ) : 
-#     async with async_session_maker() as session : 
-#         query = await RoomsRepository(session).get_all(
-#             title=title,
-#             price=price, 
-#             quantity=quantity,
-#             hotel_id=hotel_id
-#         )   
+@router.get('{hotel_id}/rooms')
+async def get_rooms(
+    hotel_id: int,
+    title: str | None = Query(default=None, description='Название номера'),
+    price : int | None = Query(default=None, description='Цена'),
+    quantity : int | None = Query(default=None, description='Вместимость номера')
+) : 
+    async with async_session_maker() as session : 
+        query = await RoomsRepository(session).get_all(
+            title=title,
+            price=price, 
+            quantity=quantity,
+            hotel_id=hotel_id
+        )   
         
-#     return query
+    return query
 
-@router.patch('/{hotel_id}/{room_id}')
+@router.patch('/{room_id}')
 async def patch_hotel(
     room_id: int,
     request: PATCHRoom, 
@@ -79,43 +79,21 @@ async def patch_hotel(
 ) : 
     data = PATCHRoomAdd(**request.model_dump(exclude_unset=True))
     await db.rooms.edit(data, is_patch=True, id=room_id)
-    not_sorted_result = await db.facilities.get_filtered(room_id=room_id)
-    
-    all_fclts_ids = {model.facility_id for model in not_sorted_result}
-    target_ids = set(request.facilities_ids)
-    ids_to_delete = all_fclts_ids - target_ids
-    ids_to_add = target_ids - all_fclts_ids
-    await db.facilities.delete(
-        RoomsFacilitiesOrm.facility_id.in_(list(ids_to_delete))
-        ) # удаляем те, которых нету в новых удобствах
-    data_to_add = [RoomsFacilitiesAdd(room_id=room_id, facility_id=fclt_id) for fclt_id in ids_to_add]
-    if ids_to_add :
-        await db.facilities.add_bulk(data_to_add) 
+    if request.facilities_ids :
+        await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
     return {'status':'OK'}
         
-@router.put('/{hotel_id}/{room_id}')
+@router.put('/{room_id}')
 async def put_room(
-    hotel_id: int,
     room_id: int,
     db: DBDep,
     request: PUTRoom
 ) : 
     data = PUTRoomAdd(**request.model_dump())
     await db.rooms.edit(data, id=room_id)
-    not_sorted_result = await db.facilities.get_filtered(room_id=room_id)
-    
-    all_fclts_ids = {model.facility_id for model in not_sorted_result}
-    target_ids = set(request.facilities_ids)
-    ids_to_delete = all_fclts_ids - target_ids
-    ids_to_add = target_ids - all_fclts_ids
-    await db.facilities.delete(
-        RoomsFacilitiesOrm.facility_id.in_(list(ids_to_delete))
-        ) # удаляем те, которых нету в новых удобствах
-    data_to_add = [RoomsFacilitiesAdd(room_id=room_id, facility_id=fclt_id) for fclt_id in ids_to_add]
-    print(data_to_add)
-    if ids_to_add :
-        await db.facilities.add_bulk(data_to_add) 
+    if request.facilities_ids :
+        await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
 
     return {'status':'OK'}

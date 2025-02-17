@@ -15,8 +15,6 @@ class RoomsRepository(BaseRepository) :
     async def get_all(self, hotel_id, title, price, quantity) : 
         get_rooms_stmt = select(RoomsOrm)
 
-        print(hotel_id, title, price, quantity)
-            
         if hotel_id : 
             get_rooms_stmt = get_rooms_stmt.filter_by(hotel_id=hotel_id)
         if title : 
@@ -34,3 +32,5 @@ class RoomsRepository(BaseRepository) :
         result_request = rooms_ids_for_booking(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
         return await self.get_filtered(RoomsOrm.id.in_(result_request))
+    
+        
