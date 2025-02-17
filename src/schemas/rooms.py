@@ -43,6 +43,13 @@ class PUTRoom(BaseModel) :
     quantity: int 
     facilities_ids: list[int] = []
 
+class PUTRoomRequest(BaseModel) :
+    title: str 
+    description: str 
+    price: int 
+    quantity: int 
+    facilities_ids: list[int] = []
+
 class PATCHRoomAdd(BaseModel) : 
     hotel_id: int | None = None
     title: str | None = None

@@ -48,7 +48,6 @@ class BaseRepository :
         await self.session.execute(add_hotel_stmt)
 
     async def edit(self, data, is_patch=False, **filter_by) -> None : 
-        print(data.model_dump(exclude_unset=True))
         edit_hotel_stmt = (
             (update(self.model)
              .filter_by(**filter_by)
