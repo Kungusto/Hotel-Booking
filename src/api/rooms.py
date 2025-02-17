@@ -13,6 +13,7 @@ from src.repositories.rooms import RoomsRepository
 from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest, PUTRoom, PUTRoomAdd, PATCHRoomAdd, PATCHRoomRequest
 from src.schemas.facilities import RoomsFacilitiesAdd
 
+
 from api.dependencies import DBDep
 
 router = APIRouter(prefix='/hotels', tags=['Номера'])
@@ -79,21 +80,22 @@ async def patch_hotel(
     db: DBDep
 ) : 
     _room_data_dict = request.model_dump(exclude_unset=True)
-    data = PATCHRoomAdd(hotel_id=hotel_id, **_room_data_dict)
+    data = PATCHRoomAdd(**_room_data_dict)
     await db.rooms.edit(data, is_patch=True, id=room_id)
     if "facilities_ids" in _room_data_dict :
         await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
     return {'status':'OK'}
         
-@router.put('/{room_id}')
+@router.put('/{hotel_id}/rooms/{room_id}')
 async def put_room(
+    hotel_id: int,
     room_id: int,
     db: DBDep,
     request: PUTRoom
 ) : 
     data = PUTRoomAdd(**request.model_dump())
-    await db.rooms.edit(data, id=room_id)
+    await db.rooms.edit(data, id=room_id, hotel_id=hotel_id)
     await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
 
@@ -109,3 +111,4 @@ async def delete_room(
         await session.commit()
     
     return {'status':'OK'}
+
