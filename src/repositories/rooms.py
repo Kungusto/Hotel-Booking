@@ -1,10 +1,11 @@
 from sqlalchemy import Engine, func, select, update, delete, insert
+from sqlalchemy.orm import selectinload, joinedload
 
 from repositories.utils import rooms_ids_for_booking
 from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
-from src.schemas.rooms import RoomAdd, RoomID, Room
+from src.schemas.rooms import RoomAdd, RoomID, Room, RoomWithRels
 
 from database import engine
 
@@ -30,7 +31,24 @@ class RoomsRepository(BaseRepository) :
     
     async def get_filtered_by_time(self, hotel_id, date_to, date_from) :
         result_request = rooms_ids_for_booking(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
-
-        return await self.get_filtered(RoomsOrm.id.in_(result_request))
+        query = (
+            select(self.model)
+            .options(joinedload(self.model.facilities))
+            .filter(RoomsOrm.id.in_(result_request))
+        )
+        print(query.compile())
+        result = await self.session.execute(query)
+        return [RoomWithRels.model_validate(model, from_attributes=True) for model in result.unique().scalars().all()]
     
-        
+    async def get_one_or_none(self, **filter_by) :
+        query = (
+                select(self.model)
+                .options(joinedload(self.model.facilities))
+                .filter_by(**filter_by)
+            )
+        result = await self.session.execute(query)
+        model = result.unique().scalars().one_or_none()
+        if model is None :
+            return None 
+        return  RoomWithRels.model_validate(model, from_attributes=True)
+    

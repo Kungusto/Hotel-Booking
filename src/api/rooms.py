@@ -44,15 +44,15 @@ async def get_rooms_by_hotel(
 ) :
     return await db.rooms.get_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
-@router.get('/{hotel_id}/{room_id}')
+@router.get('/{hotel_id}/rooms/{room_id}')
 async def get_room_by_id(
     hotel_id: int,
     db: DBDep,
     room_id: int,
 ) :
-    get_room_stmt = await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
+    result = await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
     
-    return get_room_stmt
+    return result
         
 
 @router.get('{hotel_id}/rooms')

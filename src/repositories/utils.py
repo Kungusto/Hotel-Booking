@@ -51,7 +51,7 @@ def rooms_ids_for_booking(
         select(rooms_free.c.room_id)
         .select_from(rooms_free)
         .filter(rooms_free.c.rooms_left > 0,
-                rooms_free.c.room_id.in_(rooms_ids_for_hotel)
+                rooms_free.c.room_id.in_(select(rooms_ids_for_hotel))
         )
     )
     
