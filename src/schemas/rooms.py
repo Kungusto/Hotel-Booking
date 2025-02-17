@@ -5,7 +5,7 @@ class RoomAddRequest(BaseModel) :
     description: str | None = Field(None)
     price: int
     quantity: int
-    facilities_ids: list[int] | None = None
+    facilities_ids: list[int] = []
     
 class RoomAdd(BaseModel) : 
     hotel_id: int
@@ -21,12 +21,19 @@ class RoomID(BaseModel) :
     id : int
     
 class PATCHRoom(BaseModel) : 
-    hotel_id: int | None = Field(None)
-    title: str | None = Field(None)
-    description: str | None = Field(None)
-    price: int | None = Field(None)
-    quantity: int | None = Field(None)
-    facilities_ids: list[int] | None = Field(None)
+    hotel_id: int | None = None
+    title: str | None = None
+    description: str | None = None
+    price: int | None = None
+    quantity: int | None = None
+    facilities_ids: list[int] = []
+
+class PATCHRoomRequest(BaseModel) : 
+    title: str | None = None
+    description: str | None = None
+    price: int | None = None
+    quantity: int | None = None
+    facilities_ids: list[int] = []
     
 class PUTRoom(BaseModel) :
     hotel_id: int 
@@ -34,14 +41,14 @@ class PUTRoom(BaseModel) :
     description: str 
     price: int 
     quantity: int 
-    facilities_ids: list[int]
+    facilities_ids: list[int] = []
 
 class PATCHRoomAdd(BaseModel) : 
-    hotel_id: int | None = Field(None)
-    title: str | None = Field(None)
-    description: str | None = Field(None)
-    price: int | None = Field(None)
-    quantity: int | None = Field(None)
+    hotel_id: int | None = None
+    title: str | None = None
+    description: str | None = None
+    price: int | None = None
+    quantity: int | None = None
     
 class PUTRoomAdd(BaseModel) :
     hotel_id: int 

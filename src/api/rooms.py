@@ -10,7 +10,7 @@ from src.models.facilities import RoomsFacilitiesOrm
 from src.repositories.rooms import RoomsRepository
 
 # схемы
-from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest, PUTRoom, PUTRoomAdd, PATCHRoomAdd
+from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest, PUTRoom, PUTRoomAdd, PATCHRoomAdd, PATCHRoomRequest
 from src.schemas.facilities import RoomsFacilitiesAdd
 
 from api.dependencies import DBDep
@@ -71,15 +71,17 @@ async def get_rooms(
         
     return query
 
-@router.patch('/{room_id}')
+@router.patch('/{hotel_id}/rooms/{room_id}')
 async def patch_hotel(
+    hotel_id: int,
     room_id: int,
-    request: PATCHRoom, 
+    request: PATCHRoomRequest, 
     db: DBDep
 ) : 
-    data = PATCHRoomAdd(**request.model_dump(exclude_unset=True))
+    _room_data_dict = request.model_dump(exclude_unset=True)
+    data = PATCHRoomAdd(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(data, is_patch=True, id=room_id)
-    if request.facilities_ids :
+    if "facilities_ids" in _room_data_dict :
         await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
     return {'status':'OK'}
@@ -92,8 +94,7 @@ async def put_room(
 ) : 
     data = PUTRoomAdd(**request.model_dump())
     await db.rooms.edit(data, id=room_id)
-    if request.facilities_ids :
-        await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
+    await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
 
     return {'status':'OK'}
