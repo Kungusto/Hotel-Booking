@@ -1,6 +1,7 @@
 from sqlalchemy import Engine, func, select, update, delete, insert
 from sqlalchemy.orm import selectinload, joinedload
 
+from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
 from repositories.utils import rooms_ids_for_booking
 from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
@@ -11,7 +12,7 @@ from database import engine
 
 class RoomsRepository(BaseRepository) :
     model = RoomsOrm
-    schema = Room
+    mapper = RoomDataMapper
     
     async def get_all(self, hotel_id, title, price, quantity) : 
         get_rooms_stmt = select(RoomsOrm)
@@ -38,9 +39,9 @@ class RoomsRepository(BaseRepository) :
         )
         print(query.compile())
         result = await self.session.execute(query)
-        return [RoomWithRels.model_validate(model, from_attributes=True) for model in result.unique().scalars().all()]
+        return [RoomDataMapperWithRels.map_to_domain_entity(model) for model in result.unique().scalars().all()]
     
-    async def get_one_or_none(self, **filter_by) :
+    async def get_one_or_none_with_rels(self, **filter_by) :
         query = (
                 select(self.model)
                 .options(joinedload(self.model.facilities))
@@ -50,5 +51,5 @@ class RoomsRepository(BaseRepository) :
         model = result.unique().scalars().one_or_none()
         if model is None :
             return None 
-        return  RoomWithRels.model_validate(model, from_attributes=True)
+        return RoomDataMapperWithRels.map_to_domain_entity(model)
     

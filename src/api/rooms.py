@@ -50,7 +50,7 @@ async def get_room_by_id(
     db: DBDep,
     room_id: int,
 ) :
-    result = await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
+    result = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
     
     return result
         

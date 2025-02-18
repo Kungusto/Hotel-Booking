@@ -1,13 +1,14 @@
 from sqlalchemy import delete, insert, select
 from src.repositories.base import BaseRepository
 from src.models.facilities import UslugiOrm, RoomsFacilitiesOrm
+from src.repositories.mappers.mappers import FacilitiesDataMapper, UslugiDataMapper
 
 # pydantic
 from src.schemas.facilities import Uslugi, RoomsFacilitiesAdd, RoomsFacilities
 
 class FacilitiesRepository(BaseRepository) : 
     model = RoomsFacilitiesOrm
-    schema = RoomsFacilities
+    mapper = FacilitiesDataMapper
 
     async def set_room_facilities(self, room_id: int, facilities_ids: list[int]) :
         '''Добавляет недостающие удобства и удаляет лишние'''
@@ -38,4 +39,4 @@ class FacilitiesRepository(BaseRepository) :
     
 class UslugiRepository(BaseRepository) :
     model = UslugiOrm
-    schema = Uslugi
+    mapper = UslugiDataMapper
