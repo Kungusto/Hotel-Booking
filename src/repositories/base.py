@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from src.repositories.mappers.base import DataMapper
 from src.schemas.hotels import Hotel
-from database import engine
+from src.database import engine
 
 class BaseRepository :
     model = None

@@ -5,7 +5,7 @@ from sqlalchemy import select, insert, func, update, delete
 from src.repositories.utils import rooms_ids_for_booking
 
 ## Pydantic
-from repositories.utils import rooms_ids_for_booking
+from src.repositories.utils import rooms_ids_for_booking
 from src.schemas.hotels import Hotel
 
 # ошибки

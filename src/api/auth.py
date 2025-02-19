@@ -7,7 +7,7 @@ from src.services.auth import AuthService
 
 # схемы
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
-from api.dependencies import UserIdDep
+from src.api.dependencies import UserIdDep
 
 # репозитории
 from src.repositories.users import UsersRepository

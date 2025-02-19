@@ -2,13 +2,13 @@ from sqlalchemy import Engine, func, select, update, delete, insert
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
-from repositories.utils import rooms_ids_for_booking
+from src.repositories.utils import rooms_ids_for_booking
 from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
 from src.schemas.rooms import RoomAdd, RoomID, Room, RoomWithRels
 
-from database import engine
+from src.database import engine
 
 class RoomsRepository(BaseRepository) :
     model = RoomsOrm
@@ -37,7 +37,6 @@ class RoomsRepository(BaseRepository) :
             .options(joinedload(self.model.facilities))
             .filter(RoomsOrm.id.in_(result_request))
         )
-        print(query.compile())
         result = await self.session.execute(query)
         return [RoomDataMapperWithRels.map_to_domain_entity(model) for model in result.unique().scalars().all()]
     

@@ -18,6 +18,8 @@ from src.models.hotels import HotelsOrm
 ## импорты алхимии
 from sqlalchemy import select, insert
 
+from fastapi_cache.decorator import cache
+
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
 hotels = {}
@@ -27,6 +29,7 @@ hotels = {}
     path='/{hotel_id}',
     description='<h1>Получаем отель по id<h1>',
     summary='Получение отеля по id')
+@cache(expire=30)
 async def get_hotel(
     hotel_id: int,
     db: DBDep

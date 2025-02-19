@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, Body
 
 # добавление src в поле видимости
@@ -5,6 +6,8 @@ import sys
 from pathlib import Path 
 
 sys.path.append(str(Path(__file__).parent.parent))
+
+from src.utils.init import redis_manager
 
 from src.api.hotels import router as router_hotels
 from src.api.auth import router as router_auth
@@ -16,11 +19,20 @@ import uvicorn
 
 from src.config import settings
 
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) :
+    await redis_manager.connect()
+    FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
+    yield
+    await redis_manager.close()
 
 from src.database import *
- 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(router_rooms)    
 app.include_router(router_auth)

@@ -14,7 +14,7 @@ from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest, PUTRoom,
 from src.schemas.facilities import RoomsFacilitiesAdd
 
 
-from api.dependencies import DBDep
+from src.api.dependencies import DBDep
 
 router = APIRouter(prefix='/hotels', tags=['Номера'])
 
@@ -55,22 +55,22 @@ async def get_room_by_id(
     return result
         
 
-@router.get('{hotel_id}/rooms')
-async def get_rooms(
-    hotel_id: int,
-    title: str | None = Query(default=None, description='Название номера'),
-    price : int | None = Query(default=None, description='Цена'),
-    quantity : int | None = Query(default=None, description='Вместимость номера')
-) : 
-    async with async_session_maker() as session : 
-        query = await RoomsRepository(session).get_all(
-            title=title,
-            price=price, 
-            quantity=quantity,
-            hotel_id=hotel_id
-        )   
+# @router.get('/{hotel_id}/rooms')
+# async def get_rooms(
+#     hotel_id: int,
+#     title: str | None = Query(default=None, description='Название номера'),
+#     price : int | None = Query(default=None, description='Цена'),
+#     quantity : int | None = Query(default=None, description='Вместимость номера')
+# ) : 
+#     async with async_session_maker() as session : 
+#         query = await RoomsRepository(session).get_all(
+#             title=title,
+#             price=price, 
+#             quantity=quantity,
+#             hotel_id=hotel_id
+#         )   
         
-    return query
+#     return query
 
 @router.patch('/{hotel_id}/rooms/{room_id}')
 async def patch_hotel(
