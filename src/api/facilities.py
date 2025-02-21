@@ -9,6 +9,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 
 from src.schemas.facilities import Uslugi, UslugiAdd
+from src.tasks.tasks import test_task
 
 router = APIRouter(prefix='/facilities', tags=['Удобства'])
 
@@ -21,4 +22,5 @@ async def get_all_uslugi(db: DBDep) :
 async def post_uslugi(db: DBDep, data: UslugiAdd) : 
         result = await db.uslugi.add(data=data)
         await db.commit()
+        test_task.delay()
         return result

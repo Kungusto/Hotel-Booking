@@ -6,6 +6,7 @@ from fastapi import Body, Query, APIRouter, Depends
 from src.schemas.hotels import HotelPATCH, Hotel, HotelAdd
 from src.api.dependencies import PaginationDep
 from src.api.dependencies import DBDep
+from src.tasks.tasks import test_task
 
 ### репозитории
 from src.repositories.hotels import HotelsRepository
@@ -17,7 +18,6 @@ from src.models.hotels import HotelsOrm
 
 ## импорты алхимии
 from sqlalchemy import select, insert
-
 from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
@@ -116,4 +116,5 @@ async def edit_hotels_partialy(
     except Exception as e:
         print(e)
         return {'status':'Not Found'} 
+
 
