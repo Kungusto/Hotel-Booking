@@ -13,7 +13,6 @@ from src.repositories.rooms import RoomsRepository
 from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest, PUTRoom, PUTRoomAdd, PATCHRoomAdd, PATCHRoomRequest
 from src.schemas.facilities import RoomsFacilitiesAdd
 
-
 from src.api.dependencies import DBDep
 
 router = APIRouter(prefix='/hotels', tags=['Номера'])
@@ -26,12 +25,9 @@ async def create_room(
 ) : 
     data_to_add = RoomAdd(hotel_id=hotel_id, **data.model_dump())
     room_data = await db.rooms.add(data_to_add)
-    
     dates_for_facilities = [RoomsFacilitiesAdd(room_id=room_data.id, facility_id=id_fclty) for id_fclty in data.facilities_ids]
     await db.facilities.add_bulk(dates_for_facilities)
-    
     await db.commit()
-    
     return {'status':'OK', 'data':data}
 
     
@@ -51,7 +47,6 @@ async def get_room_by_id(
     room_id: int,
 ) :
     result = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
-    
     return result
         
 
@@ -98,17 +93,15 @@ async def put_room(
     await db.rooms.edit(data, id=room_id, hotel_id=hotel_id)
     await db.facilities.set_room_facilities(room_id=room_id, facilities_ids=request.facilities_ids)
     await db.commit() 
-
     return {'status':'OK'}
 
 @router.delete('/{hotel_id}/{room_id}')
 async def delete_room(
     hotel_id: int,
-    room_id: int
+    room_id: int,
+    db: DBDep
 ) :
-    async with async_session_maker() as session :
-        await RoomsRepository(session).delete(id=room_id, hotel_id=hotel_id)
-        await session.commit()
-    
+    await db.rooms.delete(id=room_id, hotel_id=hotel_id)
+    await db.commit()
     return {'status':'OK'}
 

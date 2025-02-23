@@ -56,21 +56,19 @@ async def get_hotels(
     )
 
 @router.delete('/delete/{id_hotel}')
-async def delete_hotel(id_hotel: int) :
+async def delete_hotel(id_hotel: int, db: DBDep) :
     filters = {'id':id_hotel}
-    
-    async with async_session_maker() as session :
-        try :
-            async with async_session_maker() as session :
-                await HotelsRepository(session).delete(**filters)  
-                await session.commit()
-                return {'status':'OK'} 
-        except Exception as e:
-            print(e)
-            return {'status':'Not Found'}
+    try :
+        await db.hotels.delete(**filters)  
+        await db.commit()
+        return {'status':'OK'} 
+    except Exception as e:
+        print(e)
+        return {'status':'Not Found'}
 
 @router.post('')
 async def create_hotels(
+    db: DBDep,
     hotel_data: HotelAdd = Body(openapi_examples={
         '1':{'summary':'Сочи', 'value':
             {'title':'Сочи', 'location':'Ул. Моря, 2'}},
@@ -78,9 +76,8 @@ async def create_hotels(
              {'title':'Урюпинск-Хостел', 'location':'Улица где гаснут фонари'}}
     })
 ) :
-    async with async_session_maker() as session :
-        hotel = await HotelsRepository(session).add(data=hotel_data)
-        await session.commit() 
+    hotel = await db.hotels.add(data=hotel_data)
+    await db.commit() 
 
     return {'status':'OK', 'data':hotel}
 
@@ -88,15 +85,14 @@ async def create_hotels(
     path="/{hotel_id}", 
     summary='Полное изменение данных об отеле', 
     description='Тут мы изменяем данные об отеле')
-async def edit_hotels(hotel_id: int, hotel_data: HotelAdd) : 
+async def edit_hotels(hotel_id: int, hotel_data: HotelAdd, db:DBDep) : 
     
     filters = {'id':hotel_id}
 
     try :
-        async with async_session_maker() as session :
-            await HotelsRepository(session).edit(hotel_data, **filters)
-            await session.commit()
-            return {'status':'OK'}
+        await db.hotels.edit(hotel_data, **filters)
+        await db.commit()
+        return {'status':'OK'}
     except Exception as e:
         print(e)
         return {'status':'Not Found'}
@@ -106,13 +102,13 @@ async def edit_hotels(hotel_id: int, hotel_data: HotelAdd) :
            description='<h1>Тут мы частично изменяем данные об отеле</h1>')
 async def edit_hotels_partialy(
     hotel_id: int,
-    hotel_data: HotelPATCH
+    hotel_data: HotelPATCH,
+    db: DBDep
 ) : 
     try :
-        async with async_session_maker() as session :
-            await HotelsRepository(session).edit(hotel_data, is_patch=True, id=hotel_id)
-            await session.commit()
-            return {'status':'OK'}
+        await db.hotels.edit(hotel_data, is_patch=True, id=hotel_id)
+        await db.commit()
+        return {'status':'OK'}
     except Exception as e:
         print(e)
         return {'status':'Not Found'} 
