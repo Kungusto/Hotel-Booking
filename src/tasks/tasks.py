@@ -4,7 +4,7 @@ from time import sleep
 from src.tasks.celery_app import celery_instance
 from PIL import Image
 from src.utils.dbmanager import DBManager
-from src.database import async_session_maker, async_session_maker_null_pull
+from src.database import async_session_maker, async_session_maker_null_pool
 
 @celery_instance.task
 def test_task() : 
@@ -28,7 +28,7 @@ def resize_image(image_path: str):
 
 async def get_bookings_with_today_checkin_helper() : 
     print('ЗАПУСК ФУНКЦИИ')
-    async with DBManager(session_factory=async_session_maker_null_pull) as db : 
+    async with DBManager(session_factory=async_session_maker_null_pool) as db : 
         bookings = await db.bookings.get_bookings_with_today_checkin()
         print(f'{bookings}')
 

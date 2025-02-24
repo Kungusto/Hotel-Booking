@@ -10,3 +10,5 @@ env.py
 script.by.mako
 src/alembic.ini
 src/static/images/*
+.pytest_cache
+
