@@ -2,6 +2,9 @@ import json
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from src.schemas.hotels import HotelAdd
+from src.schemas.rooms import RoomAdd
+
 from dotenv import load_dotenv
 import os
 # Установка переменной окружения MODE в TEST перед загрузкой настроек
@@ -36,10 +39,17 @@ async def register_user() :
             })
 
 @pytest.fixture(scope="session", autouse=True)
-async def complation_db() : 
+async def complation_db_hotel() : 
     async with DBManager(session_factory=async_session_maker_null_pool) as db :
         with open('tests/mock_hotels.json', 'r', encoding='utf-8') as file : 
-            data = json.load(file)
-            print(data)
-        db.commit()
-        
+            data = [HotelAdd(**hotel) for hotel in json.load(file)] 
+            await db.hotels.add_bulk(data)
+        await db.commit()
+
+@pytest.fixture(scope="session", autouse=True)
+async def complation_db_rooms() : 
+    async with DBManager(session_factory=async_session_maker_null_pool) as db :
+        with open('tests/mock_rooms.json', 'r', encoding='utf-8') as file : 
+            data = [RoomAdd(**room) for room in json.load(file)] 
+            await db.rooms.add_bulk(data)
+        await db.commit()
