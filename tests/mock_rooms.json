@@ -1,0 +1,30 @@
+[
+    {
+        "hotel_id": 1,
+        "title": "Улучшенный с террасой и видом на озеро",
+        "description": "Невероятный красоты номер.",
+        "price": 24500,
+        "quantity": 5
+    },
+    {
+        "hotel_id": 1,
+        "title": "Делюкс Плюс",
+        "description": "Лучший номер отеля.",
+        "price": 22450,
+        "quantity": 10
+    },
+    {
+        "hotel_id": 2,
+        "title": "Номер на 2-х человек",
+        "description": "Красота неописуемая.",
+        "price": 4570,
+        "quantity": 15
+    },
+    {
+        "hotel_id": 3,
+        "title": "Номер на 3-х человек",
+        "description": null,
+        "price": 4350,
+        "quantity": 8
+    }
+]
