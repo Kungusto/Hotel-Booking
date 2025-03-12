@@ -28,6 +28,17 @@ async def setup_database():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+    async with DBManager(session_factory=async_session_maker_null_pool) as db :
+        with open('tests/mock_hotels.json', 'r', encoding='utf-8') as file : 
+            data = [HotelAdd(**hotel) for hotel in json.load(file)] 
+            await db.hotels.add_bulk(data)
+        test = await db.hotels.get_all()
+
+        with open('tests/mock_rooms.json', 'r', encoding='utf-8') as file : 
+            data = [RoomAdd(**room) for room in json.load(file)] 
+            await db.rooms.add_bulk(data)
+        await db.commit()
+
 @pytest.fixture(scope="session", autouse=True)
 async def register_user() : 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
@@ -40,18 +51,4 @@ async def register_user() :
                 "password":"John"
             })
 
-@pytest.fixture(scope="session", autouse=True)
-async def complation_db_hotel() : 
-    async with DBManager(session_factory=async_session_maker_null_pool) as db :
-        with open('tests/mock_hotels.json', 'r', encoding='utf-8') as file : 
-            data = [HotelAdd(**hotel) for hotel in json.load(file)] 
-            await db.hotels.add_bulk(data)
-        await db.commit()
 
-@pytest.fixture(scope="session", autouse=True)
-async def complation_db_rooms() : 
-    async with DBManager(session_factory=async_session_maker_null_pool) as db :
-        with open('tests/mock_rooms.json', 'r', encoding='utf-8') as file : 
-            data = [RoomAdd(**room) for room in json.load(file)] 
-            await db.rooms.add_bulk(data)
-        await db.commit()
