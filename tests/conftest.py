@@ -21,21 +21,18 @@ from src.main import app
 
 settings = Settings()
 
-@pytest.fixture(scope="session")
-async def ac() : 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
-        yield ac
 
 async def get_db_null_pool() :
     async with DBManager(session_factory=async_session_maker_null_pool) as db : 
         yield db
 
-app.dependency_overrides[get_db] = get_db_null_pool
 
 @pytest.fixture(scope="function")
 async def db() :
     async with DBManager(session_factory=async_session_maker_null_pool) as db :
         yield db
+
+app.dependency_overrides[get_db] = get_db_null_pool
 
 @pytest.fixture(scope="session", autouse=True)
 async def setup_database():
@@ -66,3 +63,8 @@ async def register_user(ac, setup_database) :
             "name":"John",
             "password":"John"
         })
+
+@pytest.fixture(scope="session")
+async def ac() : 
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
+        yield ac
