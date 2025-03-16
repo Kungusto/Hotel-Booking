@@ -58,7 +58,7 @@ async def get_room_by_id(
 #     quantity : int | None = Query(default=None, description='Вместимость номера')
 # ) : 
 #     async with async_session_maker() as session : 
-#         query = await RoomsRepository(session).get_all(
+        # query = await RoomsRepository(session).get_filtered_room(
 #             title=title,
 #             price=price, 
 #             quantity=quantity,

@@ -54,7 +54,7 @@ class BaseRepository :
         )
         await self.session.execute(edit_stmt)
          
-    async def delete(self,*filter, **filter_by) -> None : 
+    async def delete(self, *filter, **filter_by) -> None : 
         edit_stmt = (
             delete(self.model)
             .filter(*filter)

@@ -14,7 +14,7 @@ class RoomsRepository(BaseRepository) :
     model = RoomsOrm
     mapper = RoomDataMapper
     
-    async def get_all(self, hotel_id, title, price, quantity) : 
+    async def get_filtered_room(self, hotel_id, title, price, quantity) : 
         get_rooms_stmt = select(RoomsOrm)
 
         if hotel_id : 
