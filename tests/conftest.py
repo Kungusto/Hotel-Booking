@@ -2,6 +2,7 @@ import json
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from src.api.dependencies import get_db
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
 
@@ -24,6 +25,12 @@ settings = Settings()
 async def ac() : 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
         yield ac
+
+async def get_db_null_pool() :
+    async with DBManager(session_factory=async_session_maker_null_pool) as db : 
+        yield db
+
+app.dependency_overrides[get_db] = get_db_null_pool
 
 @pytest.fixture(scope="function")
 async def db() :
