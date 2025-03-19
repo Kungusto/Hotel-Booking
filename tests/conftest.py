@@ -29,7 +29,7 @@ async def get_db_null_pool() :
 
 @pytest.fixture(scope="function")
 async def db() :
-    async with DBManager(session_factory=async_session_maker_null_pool) as db :
+    async for db in get_db_null_pool() :
         yield db
 
 app.dependency_overrides[get_db] = get_db_null_pool
