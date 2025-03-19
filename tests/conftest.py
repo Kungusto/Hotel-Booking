@@ -1,3 +1,9 @@
+from dotenv import load_dotenv
+import os
+# Установка переменной окружения MODE в TEST перед загрузкой настроек
+os.environ['MODE'] = 'TEST'
+load_dotenv(".env-test", override=True)
+
 import json
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -5,12 +11,6 @@ from httpx import ASGITransport, AsyncClient
 from src.api.dependencies import get_db
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
-
-from dotenv import load_dotenv
-import os
-# Установка переменной окружения MODE в TEST перед загрузкой настроек
-os.environ['MODE'] = 'TEST'
-load_dotenv(".env-test", override=True)
 
 from src.database import async_session_maker
 from src.utils.dbmanager import DBManager
