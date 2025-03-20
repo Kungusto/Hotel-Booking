@@ -29,7 +29,6 @@ async def test_booking_crud(db: DBManager) :
     await db.bookings.edit(data_to_edit, is_patch=True, user_id=user_id, room_id=room_id)
     booking_data = await db.bookings.get_one_or_none(user_id=user_id, room_id=room_id)
     assert booking_data
-    print(booking_data)
     assert {'date_from' : booking_data.date_from, 
             'date_to' : booking_data.date_to,
               'price' : booking_data.price} == {'date_from' : data_to_edit.date_from, 
