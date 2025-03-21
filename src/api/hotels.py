@@ -22,20 +22,6 @@ from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
-hotels = {}
-
-
-@router.get(
-    path='/{hotel_id}',
-    description='<h1>Получаем отель по id<h1>',
-    summary='Получение отеля по id')
-@cache(expire=30)
-async def get_hotel(
-    hotel_id: int,
-    db: DBDep
-    ) :
-        return await db.hotels.get_one_or_none(id=hotel_id)
-
 @router.get('')
 async def get_hotels(
     pagination: PaginationDep,
@@ -54,6 +40,18 @@ async def get_hotels(
         limit=pagination.per_page, 
         offset=pagination.per_page * (pagination.page - 1)
     )
+
+@router.get(
+    path='/{hotel_id}',
+    description='<h1>Получаем отель по id<h1>',
+    summary='Получение отеля по id')
+@cache(expire=30)
+async def get_hotel(
+    hotel_id: int,
+    db: DBDep
+    ) :
+        return await db.hotels.get_one_or_none(id=hotel_id)
+
 
 @router.delete('/delete/{id_hotel}')
 async def delete_hotel(id_hotel: int, db: DBDep) :

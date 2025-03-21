@@ -15,7 +15,11 @@ async def create_booking(data: AddBookingsFromUser, db: DBDep, user_id: GetUserI
         user_id=user_id, 
         price=price,
         **data.dict())
+    available_rooms : list[int] = await db.bookings.get_available_room()
+    if not (data.room_id in available_rooms) :
+        raise Exception  
     bookings_returned = await db.bookings.add(data=booking_add)
+        
     await db.commit()
     return bookings_returned
 

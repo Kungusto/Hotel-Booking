@@ -42,7 +42,3 @@ async def test_booking_crud(db: DBManager) :
     assert not booking_data
 
     await db.commit()
-
-
-
-
