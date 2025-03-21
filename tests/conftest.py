@@ -1,3 +1,7 @@
+from unittest import mock
+
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
+
 from dotenv import load_dotenv
 import os
 # Установка переменной окружения MODE в TEST перед загрузкой настроек
@@ -11,7 +15,9 @@ from httpx import ASGITransport, AsyncClient
 from src.api.dependencies import get_db
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
+from src.schemas.users import User
 
+from src.services.auth import AuthService
 from src.database import async_session_maker
 from src.utils.dbmanager import DBManager
 from src.config import Settings
@@ -68,3 +74,20 @@ async def register_user(ac, setup_database) :
 async def ac() : 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
         yield ac
+
+@pytest.fixture(scope="session", autouse=True)
+async def authenticated_ac(register_user, ac) : 
+    response = await ac.post(
+        url="/auth/login",
+        json={
+            "email":"John@example.com",
+            "password":"John"            
+        }
+    )
+    async with DBManager(session_factory=async_session_maker_null_pool) as _db :
+        user_id = (AuthService().decode_token(dict(response.cookies)["access_token"]))["user_id"]
+        assert user_id
+        assert response.cookies
+        user = await _db.users.get_filtered(id=user_id)
+        assert user
+        return user
