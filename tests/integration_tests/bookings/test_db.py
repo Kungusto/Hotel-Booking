@@ -3,6 +3,7 @@ from src.utils.dbmanager import DBManager
 from datetime import date
 
 async def test_booking_crud(db: DBManager) : 
+    await db.bookings.delete() # удаляем предыдущие записи, т.к. они мешают тестировать crud-операции
     user_id = (await db.users.get_all())[0].id
     room_id = (await db.rooms.get_all())[0].id
     data_to_add = AddBookings(

@@ -75,8 +75,8 @@ async def ac() :
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
         yield ac
 
-@pytest.fixture(scope="session", autouse=True)
-async def authenticated_ac(register_user, ac) : 
+@pytest.fixture(scope="session")
+async def authenticated_ac(register_user, ac : AsyncClient) : 
     response = await ac.post(
         url="/auth/login",
         json={
@@ -84,10 +84,4 @@ async def authenticated_ac(register_user, ac) :
             "password":"John"            
         }
     )
-    async with DBManager(session_factory=async_session_maker_null_pool) as _db :
-        user_id = (AuthService().decode_token(dict(response.cookies)["access_token"]))["user_id"]
-        assert user_id
-        assert response.cookies
-        user = await _db.users.get_filtered(id=user_id)
-        assert user
-        return user
+    yield ac
