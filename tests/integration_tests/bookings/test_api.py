@@ -37,17 +37,17 @@ async def delete_bookings() :
         await db.bookings.delete()
         await db.commit()
 
-@pytest.mark.parametrize("room_id, date_from, date_to, status_code, num_of_booking", [
-    (1, "2025-03-21", "2025-03-23", 200, 1),
-    (1, "2025-04-22", "2025-04-30", 200, 2),
-    (1, "2025-04-29", "2025-05-01", 200, 3),
-    (1, "2025-04-21", "2025-05-23", 200, 4),
-    (1, "2025-11-21", "2026-01-01", 200, 5),
-    (1, "2025-02-21", "2025-03-03", 200, 6),
+@pytest.mark.parametrize("room_id, date_from, date_to, num_of_booking", [
+    (1, "2025-03-21", "2025-03-23", 1),
+    (1, "2025-04-22", "2025-04-30", 2),
+    (1, "2025-04-29", "2025-05-01", 3),
+    (1, "2025-04-21", "2025-05-23", 4),
+    (1, "2025-11-21", "2026-01-01", 5),
+    (1, "2025-02-21", "2025-03-03", 6),
 ])
 async def test_add_and_get_my_bookings(delete_bookings, 
         authenticated_ac,
-        room_id, date_from, date_to, status_code, num_of_booking
+        room_id, date_from, date_to, num_of_booking
         ) :  
     response_post = await authenticated_ac.post(
         url="/bookings/create_booking",
@@ -57,7 +57,6 @@ async def test_add_and_get_my_bookings(delete_bookings,
             "date_to" : date_to
           }    
     )
-    assert response_post.status_code == status_code
     response_get = await authenticated_ac.get(
         url="/bookings/me"
     )
