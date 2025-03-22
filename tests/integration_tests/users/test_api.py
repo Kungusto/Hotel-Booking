@@ -27,15 +27,13 @@ async def test_auth(ac) :
         }
     )
     assert auth_ac.status_code == 200
-    cookies = ac.cookies
-    assert cookies
+    assert ac.cookies
     assert "access_token" in ac.cookies
 
 
     # /auth/me
     all_bookings = await ac.get(
         url="/auth/me",
-        cookies=cookies
     )
     assert all_bookings.status_code == 200
     assert isinstance(all_bookings.json(), dict)
