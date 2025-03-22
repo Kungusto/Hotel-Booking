@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request, Response
 from src.schemas.bookings import AddBookingsFromUser, AddBookings
 from src.api.dependencies import DBDep, GetUserId
-
 from datetime import timedelta
 
 router = APIRouter(prefix='/bookings', tags=['Бронирование'])
@@ -15,11 +14,12 @@ async def create_booking(data: AddBookingsFromUser, db: DBDep, user_id: GetUserI
         user_id=user_id, 
         price=price,
         **data.dict())
-    available_rooms : list[int] = await db.bookings.get_available_room()
+    hotel_id = (await db.rooms.get_one_or_none(id=data.room_id)).hotel_id
+    print(hotel_id)
+    available_rooms : list[int] = await db.bookings.get_available_room(hotel_id)
     if not (data.room_id in available_rooms) :
         raise Exception  
     bookings_returned = await db.bookings.add(data=booking_add)
-        
     await db.commit()
     return bookings_returned
 

@@ -19,12 +19,12 @@ class BookingsRepository(BaseRepository) :
         res = await self.session.execute(query)
         return [BookingDataMapper.map_to_domain_entity(model) for model in res.scalars().all()]
 
-    async def get_available_room(self) -> list[int] :
-        '''Возвращает свободные номера на данный момент'''
+    async def get_available_room(self, hotel_id) -> list[int] :
+        '''Возвращает свободные номера на данных'''
         test_data = rooms_ids_for_booking(
             date_from=date(year=2024, month=12, day=25),
             date_to=date(year=2025, month=2, day=15),
-            hotel_id=1
+            hotel_id=hotel_id
         )
         result = await self.session.execute(test_data)
         return result.scalars().all()
