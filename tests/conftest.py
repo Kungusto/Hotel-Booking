@@ -75,6 +75,8 @@ async def ac() :
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac : 
         yield ac
 
+
+
 @pytest.fixture(scope="session")
 async def authenticated_ac(register_user, ac : AsyncClient) : 
     response = await ac.post(
