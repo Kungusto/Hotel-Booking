@@ -1,7 +1,5 @@
 from sqlalchemy import select
-
 from pydantic import EmailStr
-
 from src.repositories.mappers.mappers import UserDataMapper
 from src.repositories.base import BaseRepository
 from src.models.users import UsersOrm

@@ -1,15 +1,12 @@
 import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-
-# добавление src в поле видимости
 import sys
 from pathlib import Path 
-
+# добавление src в поле видимости
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.utils.init import redis_manager
-
 from src.api.hotels import router as router_hotels
 from src.api.auth import router as router_auth
 from src.api.rooms import router as router_rooms

@@ -1,19 +1,11 @@
 from fastapi import APIRouter, HTTPException, Response
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
-
-# сервисы
 from src.services.auth import AuthService
 from src.api.dependencies import DBDep
-
-# схемы
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
 from src.api.dependencies import UserIdDep
-
-# репозитории
 from src.repositories.users import UsersRepository
-
-# базы данных и ORM
 from src.database import async_session_maker
 
 router = APIRouter(prefix='/auth', tags=['Авторизация и аутентификация'])

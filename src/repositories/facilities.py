@@ -2,8 +2,6 @@ from sqlalchemy import delete, insert, select
 from src.repositories.base import BaseRepository
 from src.models.facilities import UslugiOrm, RoomsFacilitiesOrm
 from src.repositories.mappers.mappers import FacilitiesDataMapper, UslugiDataMapper
-
-# pydantic
 from src.schemas.facilities import RoomsFacilitiesAdd
 
 class FacilitiesRepository(BaseRepository) : 

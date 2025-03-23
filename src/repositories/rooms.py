@@ -1,6 +1,5 @@
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
 from src.repositories.utils import rooms_ids_for_booking
 from src.repositories.base import BaseRepository

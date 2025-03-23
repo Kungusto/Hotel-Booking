@@ -1,6 +1,6 @@
 from fastapi import HTTPException
+from datetime import date
 from sqlalchemy import select
-
 from src.schemas.bookings import AddBookings
 from src.repositories.mappers.mappers import BookingDataMapper
 from src.repositories.base import BaseRepository
@@ -8,7 +8,6 @@ from src.repositories.rooms import RoomsRepository
 from src.models.bookings import BookingsOrm
 from src.repositories.utils import rooms_ids_for_booking
 
-from datetime import date
 
 class BookingsRepository(BaseRepository) : 
     model = BookingsOrm

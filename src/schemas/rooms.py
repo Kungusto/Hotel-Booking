@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-
 from src.schemas.facilities import Uslugi
 
 class RoomAddRequest(BaseModel) : 
