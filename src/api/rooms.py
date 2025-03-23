@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Body, HTTPException, Query
 from datetime import date
-from src.exceptions.exceptions import DepartureBeforeArrivalException, ObjectNotFoundException, NoChangesException
+from src.exceptions.exceptions import (
+    DepartureBeforeArrivalException,
+    ObjectNotFoundException,
+    NoChangesException,
+)
 from src.schemas.rooms import (
     RoomAdd,
     RoomAddRequest,
@@ -20,7 +24,7 @@ async def create_room(
     db: DBDep, hotel_id: int = Query(), data: RoomAddRequest = Body()
 ):
     data_to_add = RoomAdd(hotel_id=hotel_id, **data.model_dump())
-    try :
+    try:
         room_data = await db.rooms.add(data_to_add)
     except ObjectNotFoundException:
         raise HTTPException(status_code=404, detail="Отель не найден")
@@ -29,8 +33,8 @@ async def create_room(
         RoomsFacilitiesAdd(room_id=room_data.id, facility_id=id_fclty)
         for id_fclty in data.facilities_ids
     ]
-    if dates_for_facilities :
-        await db.facilities.add_bulk(dates_for_facilities) 
+    if dates_for_facilities:
+        await db.facilities.add_bulk(dates_for_facilities)
     await db.commit()
     return {"status": "OK", "data": data}
 
@@ -42,11 +46,11 @@ async def get_rooms_by_hotel(
     date_from: date = Query(examples="2025-02-10"),
     date_to: date = Query(examples="2025-02-17"),
 ):
-    try :
+    try:
         rooms = await db.rooms.get_filtered_by_time(
             hotel_id=hotel_id, date_from=date_from, date_to=date_to
         )
-    except DepartureBeforeArrivalException as ex: 
+    except DepartureBeforeArrivalException as ex:
         raise HTTPException(status_code=400, detail=ex.detail)
     return rooms
 
@@ -57,9 +61,9 @@ async def get_room_by_id(
     db: DBDep,
     room_id: int,
 ):
-    try :
+    try:
         result = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
-    except ObjectNotFoundException :
+    except ObjectNotFoundException:
         raise HTTPException(status_code=404, detail="Номер не найден")
     return result
 
@@ -70,9 +74,9 @@ async def patch_hotel(
 ):
     _room_data_dict = request.model_dump(exclude_unset=True)
     data = PATCHRoomAdd(**_room_data_dict)
-    try :
+    try:
         await db.rooms.edit(data, is_patch=True, id=room_id)
-    except NoChangesException :
+    except NoChangesException:
         raise HTTPException(status_code=400, detail="Номера не существует")
     if "facilities_ids" in _room_data_dict:
         await db.facilities.set_room_facilities(
@@ -85,9 +89,9 @@ async def patch_hotel(
 @router.put("/{hotel_id}/rooms/{room_id}")
 async def put_room(hotel_id: int, room_id: int, db: DBDep, request: PUTRoom):
     data = PUTRoomAdd(**request.model_dump(), hotel_id=hotel_id)
-    try :
+    try:
         await db.rooms.edit(data, id=room_id, hotel_id=hotel_id)
-    except NoChangesException :
+    except NoChangesException:
         raise HTTPException(status_code=400, detail="Номера не существует")
     await db.facilities.set_room_facilities(
         room_id=room_id, facilities_ids=request.facilities_ids
@@ -98,9 +102,9 @@ async def put_room(hotel_id: int, room_id: int, db: DBDep, request: PUTRoom):
 
 @router.delete("/{hotel_id}/{room_id}")
 async def delete_room(hotel_id: int, room_id: int, db: DBDep):
-    try :
+    try:
         await db.rooms.delete(id=room_id, hotel_id=hotel_id)
-    except NoChangesException :
+    except NoChangesException:
         raise HTTPException(status_code=400, detail="Номера не существует")
     await db.commit()
     return {"status": "OK"}

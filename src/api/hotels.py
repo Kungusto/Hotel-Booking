@@ -1,4 +1,7 @@
-from src.exceptions.exceptions import DepartureBeforeArrivalException, ObjectNotFoundException
+from src.exceptions.exceptions import (
+    DepartureBeforeArrivalException,
+    ObjectNotFoundException,
+)
 from datetime import date
 from fastapi import Body, HTTPException, Query, APIRouter
 from src.schemas.hotels import HotelPATCH, HotelAdd
@@ -18,8 +21,8 @@ async def get_hotels(
     date_from: date = Query(examples="2025-02-08"),
     date_to: date = Query(examples="2025-02-15"),
 ):
-    try :
-        per_page = pagination.per_page or 5 
+    try:
+        per_page = pagination.per_page or 5
         return await db.hotels.get_filtered_by_time(
             date_from=date_from,
             date_to=date_to,
@@ -39,11 +42,12 @@ async def get_hotels(
 )
 @cache(expire=30)
 async def get_hotel(hotel_id: int, db: DBDep):
-    try :
+    try:
         hotel = await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException :
+    except ObjectNotFoundException:
         raise HTTPException(status_code=404, detail="Отель не найден")
     return hotel
+
 
 @router.delete("/delete/{id_hotel}")
 async def delete_hotel(id_hotel: int, db: DBDep):

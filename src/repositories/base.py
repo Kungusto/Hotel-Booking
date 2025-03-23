@@ -5,6 +5,7 @@ from src.repositories.mappers.base import DataMapper
 from src.exceptions.exceptions import ObjectNotFoundException, NoChangesException
 from sqlalchemy.exc import NoResultFound, IntegrityError
 
+
 class BaseRepository:
     model = None
     mapper: DataMapper = None
@@ -42,17 +43,17 @@ class BaseRepository:
         """sqlalchemy.exc.NoResultFound"""
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
-        try :
+        try:
             model = result.scalar_one()
-        except NoResultFound: 
+        except NoResultFound:
             raise ObjectNotFoundException
         return self.mapper.map_to_domain_entity(model)
 
     async def add(self, data):
         add_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        try : 
+        try:
             result = await self.session.execute(add_stmt)
-        except IntegrityError :
+        except IntegrityError:
             raise ObjectNotFoundException
         model = result.scalars().first()
         return self.mapper.map_to_domain_entity(model)
@@ -70,16 +71,21 @@ class BaseRepository:
         )
         models = await self.session.execute(edit_stmt)
         result = models.scalars().all()
-        if result :
+        if result:
             return [self.mapper.map_to_domain_entity(model) for model in result]
-        else : 
+        else:
             raise NoChangesException
 
     async def delete(self, *filter, **filter_by) -> None:
-        edit_stmt = delete(self.model).filter(*filter).filter_by(**filter_by).returning(self.model)
+        edit_stmt = (
+            delete(self.model)
+            .filter(*filter)
+            .filter_by(**filter_by)
+            .returning(self.model)
+        )
         models = await self.session.execute(edit_stmt)
         result = models.scalars().all()
-        if result :
+        if result:
             return [self.mapper.map_to_domain_entity(model) for model in result]
-        else : 
+        else:
             raise NoChangesException

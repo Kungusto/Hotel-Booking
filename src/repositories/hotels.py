@@ -21,7 +21,7 @@ class HotelsRepository(BaseRepository):
         limit: int = 0,
         offset: int = 5,
     ):
-        if date_from > date_to :
+        if date_from > date_to:
             raise DepartureBeforeArrivalException
         rooms_stmt = rooms_ids_for_booking(date_from=date_from, date_to=date_to)
 

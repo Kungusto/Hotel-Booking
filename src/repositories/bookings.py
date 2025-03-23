@@ -7,6 +7,7 @@ from src.models.bookings import BookingsOrm
 from src.repositories.utils import rooms_ids_for_booking
 from src.exceptions.exceptions import AllRoomsAreBookedException
 
+
 class BookingsRepository(BaseRepository):
     model = BookingsOrm
     mapper = BookingDataMapper
@@ -29,11 +30,7 @@ class BookingsRepository(BaseRepository):
         result = rooms.scalars().all()
         return result
 
-    async def add_booking(
-        self,
-        data: AddBookings,
-        hotel_id: int
-    ):
+    async def add_booking(self, data: AddBookings, hotel_id: int):
         """Добавляет бронирование с учетом уже имеющихся"""
         # достаем номера, которые можно забронировать на этот интервал
         available_rooms: list[int] = await self.get_available_room(

@@ -1,6 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from src.exceptions.exceptions import DepartureBeforeArrivalException, ObjectNotFoundException
+from src.exceptions.exceptions import (
+    DepartureBeforeArrivalException,
+    ObjectNotFoundException,
+)
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
 from src.repositories.utils import rooms_ids_for_booking
 from src.repositories.base import BaseRepository
@@ -27,12 +30,8 @@ class RoomsRepository(BaseRepository):
 
         return result.scalars().all()
 
-    async def get_filtered_by_time(
-            self, 
-            hotel_id, 
-            date_to, 
-            date_from):
-        if date_from > date_to :
+    async def get_filtered_by_time(self, hotel_id, date_to, date_from):
+        if date_from > date_to:
             raise DepartureBeforeArrivalException
         result_request = rooms_ids_for_booking(
             hotel_id=hotel_id, date_from=date_from, date_to=date_to
@@ -59,4 +58,3 @@ class RoomsRepository(BaseRepository):
         if model is None:
             raise ObjectNotFoundException
         return RoomDataMapperWithRels.map_to_domain_entity(model)
-
