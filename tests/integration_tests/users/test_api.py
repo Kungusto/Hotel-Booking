@@ -5,7 +5,7 @@ import pytest
     "email, name, nickname, password, status_code",
     [
         ("user@example.com", "John", "Johny312", "12345", 200),
-        ("user@example.com", "John", "Johny312", "12345", 400),
+        ("user@example.com", "John", "Johny312", "12345", 409),
         ("бу!", "John", "Johny312", "12345", 422),
     ],
 )

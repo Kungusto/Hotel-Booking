@@ -48,7 +48,6 @@ class PATCHRoomRequest(BaseModel):
 
 
 class PUTRoom(BaseModel):
-    hotel_id: int
     title: str
     description: str
     price: int

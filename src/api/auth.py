@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Response
-from sqlalchemy.exc import IntegrityError
+from src.exceptions.exceptions import UserAlreadyExistsException
 from passlib.context import CryptContext
 from src.services.auth import AuthService
 from src.api.dependencies import DBDep
@@ -25,9 +25,9 @@ async def register_user(data: UserRequestAdd, db: DBDep):
     try:
         hotel = await db.users.add(new_user_data)
         await db.commit()
-    except IntegrityError:
+    except UserAlreadyExistsException:
         raise HTTPException(
-            status_code=400, detail="Пользователь с таким email уже существует!"
+            status_code=409, detail="Пользователь с таким email уже существует!"
         )
     return {"status": "OK", "data": hotel}
 

@@ -1,4 +1,4 @@
-from src.schemas.bookings import AddBookings, Booking, PATCHBookings
+from src.schemas.bookings import AddBookings, PATCHBookings
 from src.utils.dbmanager import DBManager
 from datetime import date
 
@@ -22,7 +22,7 @@ async def test_booking_crud(db: DBManager):
     assert new_booking_data == data_to_add.model_dump()
 
     # Прочитать
-    booking_data: Booking = (
+    booking_data = (
         await db.bookings.get_one_or_none(user_id=user_id, room_id=room_id)
     ).model_dump()
     del booking_data["id"]  # для теста

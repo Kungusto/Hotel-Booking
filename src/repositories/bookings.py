@@ -1,13 +1,11 @@
-from fastapi import HTTPException
 from datetime import date
 from sqlalchemy import select
 from src.schemas.bookings import AddBookings
 from src.repositories.mappers.mappers import BookingDataMapper
 from src.repositories.base import BaseRepository
-from src.repositories.rooms import RoomsRepository
 from src.models.bookings import BookingsOrm
 from src.repositories.utils import rooms_ids_for_booking
-
+from src.exceptions.exceptions import AllRoomsAreBookedException
 
 class BookingsRepository(BaseRepository):
     model = BookingsOrm
@@ -34,16 +32,15 @@ class BookingsRepository(BaseRepository):
     async def add_booking(
         self,
         data: AddBookings,
+        hotel_id: int
     ):
         """Добавляет бронирование с учетом уже имеющихся"""
         # достаем номера, которые можно забронировать на этот интервал
-        hotel_id = (
-            await RoomsRepository(self.session).get_one_or_none(id=data.room_id)
-        ).hotel_id
         available_rooms: list[int] = await self.get_available_room(
             hotel_id, date_from=data.date_from, date_to=data.date_to
         )
         # проверяем, есть ли указанный пользователем номер в списке свободных
-        if data.room_id not in available_rooms:
-            raise HTTPException(500)
-        return await self.add(data=data)
+        if data.room_id in available_rooms:
+            new_booking = await self.add(data=data)
+            return new_booking
+        raise AllRoomsAreBookedException

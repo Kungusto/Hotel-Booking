@@ -2,7 +2,8 @@ from typing import Sequence
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
 from src.repositories.mappers.base import DataMapper
-
+from src.exceptions.exceptions import ObjectNotFoundException, NoChangesException
+from sqlalchemy.exc import NoResultFound, IntegrityError
 
 class BaseRepository:
     model = None
@@ -34,9 +35,25 @@ class BaseRepository:
             return None
         return self.mapper.map_to_domain_entity(model)
 
+    async def get_one(self, **filter_by):
+        """asyncpg.exceptions.DataError"""
+        """sqlalchemy.dialects.postgresql.asyncpg.Error"""
+        """sqlalchemy.exc.DBAPIError"""
+        """sqlalchemy.exc.NoResultFound"""
+        query = select(self.model).filter_by(**filter_by)
+        result = await self.session.execute(query)
+        try :
+            model = result.scalar_one()
+        except NoResultFound: 
+            raise ObjectNotFoundException
+        return self.mapper.map_to_domain_entity(model)
+
     async def add(self, data):
         add_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        result = await self.session.execute(add_stmt)
+        try : 
+            result = await self.session.execute(add_stmt)
+        except IntegrityError :
+            raise ObjectNotFoundException
         model = result.scalars().first()
         return self.mapper.map_to_domain_entity(model)
 
@@ -49,9 +66,20 @@ class BaseRepository:
             update(self.model)
             .filter_by(**filter_by)
             .values(**data.model_dump(exclude_unset=is_patch))
+            .returning(self.model)
         )
-        await self.session.execute(edit_stmt)
+        models = await self.session.execute(edit_stmt)
+        result = models.scalars().all()
+        if result :
+            return [self.mapper.map_to_domain_entity(model) for model in result]
+        else : 
+            raise NoChangesException
 
     async def delete(self, *filter, **filter_by) -> None:
-        edit_stmt = delete(self.model).filter(*filter).filter_by(**filter_by)
-        await self.session.execute(edit_stmt)
+        edit_stmt = delete(self.model).filter(*filter).filter_by(**filter_by).returning(self.model)
+        models = await self.session.execute(edit_stmt)
+        result = models.scalars().all()
+        if result :
+            return [self.mapper.map_to_domain_entity(model) for model in result]
+        else : 
+            raise NoChangesException

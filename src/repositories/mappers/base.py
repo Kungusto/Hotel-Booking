@@ -11,7 +11,7 @@ class DataMapper:
     schema: type[SchemaType] = None
 
     @classmethod
-    def map_to_domain_entity(cls, data):
+    def map_to_domain_entity(cls, data) -> BaseModel:
         return cls.schema.model_validate(data, from_attributes=True)
 
     @classmethod
