@@ -4,7 +4,7 @@ from time import sleep
 from src.tasks.celery_app import celery_instance
 from PIL import Image
 from src.utils.dbmanager import DBManager
-from src.database import async_session_maker, async_session_maker_null_pool
+from src.database import async_session_maker_null_pool
 
 @celery_instance.task
 def test_task() : 

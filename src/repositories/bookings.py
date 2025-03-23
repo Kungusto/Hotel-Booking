@@ -40,6 +40,6 @@ class BookingsRepository(BaseRepository) :
         hotel_id = (await RoomsRepository(self.session).get_one_or_none(id=data.room_id)).hotel_id
         available_rooms : list[int] = await self.get_available_room(hotel_id, date_from=data.date_from, date_to=data.date_to)
         # проверяем, есть ли указанный пользователем номер в списке свободных
-        if not (data.room_id in available_rooms) :
+        if data.room_id not in available_rooms :
             raise HTTPException(500)
-        bookings_returned = await self.add(data=data)
+        return await self.add(data=data)

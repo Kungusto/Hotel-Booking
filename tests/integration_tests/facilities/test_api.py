@@ -1,7 +1,3 @@
-from src.schemas.facilities import UslugiAdd
-from src.config import settings
-import json
-
 async def test_facilities_add(ac, db) :
     response = await ac.post(
         url="/facilities",

@@ -1,18 +1,7 @@
-# импорт библиотек
 from fastapi import APIRouter, Body, Query
 from datetime import date
-
-# база данныз и подключение к ней
-from src.database import async_session_maker
-from src.models.facilities import RoomsFacilitiesOrm
-
-# репозитории
-from src.repositories.rooms import RoomsRepository
-
-# схемы
-from src.schemas.rooms import Room, PATCHRoom, RoomAdd, RoomAddRequest, PUTRoom, PUTRoomAdd, PATCHRoomAdd, PATCHRoomRequest
+from src.schemas.rooms import RoomAdd, RoomAddRequest, PUTRoom, PUTRoomAdd, PATCHRoomAdd, PATCHRoomRequest
 from src.schemas.facilities import RoomsFacilitiesAdd
-
 from src.api.dependencies import DBDep
 
 router = APIRouter(prefix='/hotels', tags=['Номера'])

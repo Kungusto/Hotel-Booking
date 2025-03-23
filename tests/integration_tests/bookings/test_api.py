@@ -1,5 +1,3 @@
-from datetime import date
-from src.schemas.bookings import AddBookingsFromUser
 from tests.conftest import get_db_null_pool
 import pytest
 

@@ -1,5 +1,6 @@
+import uvicorn
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, Body
+from fastapi import FastAPI
 
 # добавление src в поле видимости
 import sys
@@ -15,23 +16,14 @@ from src.api.rooms import router as router_rooms
 from src.api.bookings import router as router_bookings
 from src.api.facilities import router as router_facilities
 from src.api.images import router as router_images
-
-import uvicorn
-
-from src.config import settings
-
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from fastapi_cache.decorator import cache
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) :
     await redis_manager.connect()
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
     yield
     await redis_manager.close()
-
-from src.database import *
 
 app = FastAPI(lifespan=lifespan)
 

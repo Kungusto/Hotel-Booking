@@ -1,11 +1,7 @@
-from src.database import Base
-
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import ForeignKey, Integer, Date
-
 from datetime import date, timedelta
 from sqlalchemy.ext.hybrid import hybrid_property
-
 from src.database import Base
 
 class BookingsOrm(Base) : 

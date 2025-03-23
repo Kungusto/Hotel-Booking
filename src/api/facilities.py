@@ -1,14 +1,7 @@
-import json
-
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 from src.api.dependencies import DBDep
-from src.utils.init import redis_manager
-
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
-
-from src.schemas.facilities import Uslugi, UslugiAdd
+from src.schemas.facilities import UslugiAdd
 from src.tasks.tasks import test_task
 
 router = APIRouter(prefix='/facilities', tags=['Удобства'])

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Response, Request
+from fastapi import APIRouter, HTTPException, Response
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 

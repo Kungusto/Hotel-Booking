@@ -1,23 +1,8 @@
-## импорты FastAPI
 from datetime import date
-from fastapi import Body, Query, APIRouter, Depends
-
-## src импорты!
-from src.schemas.hotels import HotelPATCH, Hotel, HotelAdd
+from fastapi import Body, Query, APIRouter
+from src.schemas.hotels import HotelPATCH, HotelAdd
 from src.api.dependencies import PaginationDep
 from src.api.dependencies import DBDep
-from src.tasks.tasks import test_task
-
-### репозитории
-from src.repositories.hotels import HotelsRepository
-from src.repositories.rooms import RoomsRepository
-
-### импорт orm
-from src.database import async_session_maker
-from src.models.hotels import HotelsOrm
-
-## импорты алхимии
-from sqlalchemy import select, insert
 from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
@@ -37,8 +22,8 @@ async def get_hotels(
         date_to=date_to,
         location=location,
         title=title,
-        limit=pagination.per_page, 
-        offset=pagination.per_page * (pagination.page - 1)
+        limit=per_page, 
+        offset=per_page * (pagination.page - 1)
     )
 
 @router.get(

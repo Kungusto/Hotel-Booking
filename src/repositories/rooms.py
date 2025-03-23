@@ -1,14 +1,10 @@
-from sqlalchemy import Engine, func, select, update, delete, insert
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
 from src.repositories.utils import rooms_ids_for_booking
-from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
-from src.schemas.rooms import RoomAdd, RoomID, Room, RoomWithRels
-
-from src.database import engine
 
 class RoomsRepository(BaseRepository) :
     model = RoomsOrm

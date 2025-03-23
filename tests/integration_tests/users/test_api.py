@@ -1,5 +1,3 @@
-from src.schemas.users import UserRequestAdd
-from pydantic import BaseModel
 import pytest
 
 @pytest.mark.parametrize("email, name, nickname, password, status_code", [

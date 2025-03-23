@@ -1,12 +1,13 @@
-from unittest import mock
+# ruff: noqa: E402, F403
 
-mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
-
+# Установка переменной окружения MODE в TEST перед загрузкой настроек
 from dotenv import load_dotenv
 import os
-# Установка переменной окружения MODE в TEST перед загрузкой настроек
 os.environ['MODE'] = 'TEST'
 load_dotenv(".env-test", override=True)
+# Мокаем декоратор кэш
+from unittest import mock
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import json
 import pytest
@@ -15,16 +16,11 @@ from httpx import ASGITransport, AsyncClient
 from src.api.dependencies import get_db
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
-from src.schemas.users import User
-
-from src.services.auth import AuthService
-from src.database import async_session_maker
-from src.utils.dbmanager import DBManager
-from src.config import Settings
-from src.database import Base, engine_null_pool, async_session_maker_null_pool
-from src.models import *
-from src.main import app
-
+from src.utils.dbmanager import DBManager 
+from src.config import Settings 
+from src.database import Base, engine_null_pool, async_session_maker_null_pool 
+from src.models import * 
+from src.main import app 
 settings = Settings()
 
 
@@ -52,8 +48,6 @@ async def setup_database():
         with open('tests/mock_hotels.json', 'r', encoding='utf-8') as file : 
             data = [HotelAdd(**hotel) for hotel in json.load(file)] 
             await _db.hotels.add_bulk(data)
-        test = await _db.hotels.get_all()
-
         with open('tests/mock_rooms.json', 'r', encoding='utf-8') as file : 
             data = [RoomAdd(**room) for room in json.load(file)] 
             await _db.rooms.add_bulk(data)
@@ -79,7 +73,7 @@ async def ac() :
 
 @pytest.fixture(scope="session")
 async def authenticated_ac(register_user, ac : AsyncClient) : 
-    response = await ac.post(
+    await ac.post(
         url="/auth/login",
         json={
             "email":"John@example.com",
