@@ -2,7 +2,7 @@ from src.models.facilities import RoomsFacilitiesOrm, UslugiOrm
 from src.schemas.facilities import RoomsFacilities, Uslugi
 from src.schemas.rooms import Room, RoomWithRels
 from src.schemas.users import User
-from src.schemas.bookings import AddBookings, Booking
+from src.schemas.bookings import Booking
 from src.models.bookings import BookingsOrm
 from src.models.users import UsersOrm
 from src.models.hotels import HotelsOrm

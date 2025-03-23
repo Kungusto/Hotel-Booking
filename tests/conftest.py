@@ -25,7 +25,7 @@ from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.models import *
 from src.main import app
 
-settings = Settings() # type: ignore
+settings = Settings()  # type: ignore
 
 
 async def get_db_null_pool():

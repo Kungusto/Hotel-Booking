@@ -15,7 +15,8 @@ class AddBookings(BaseModel):
     user_id: int
     price: int
 
-class Booking(AddBookings) : 
+
+class Booking(AddBookings):
     id: int
 
 

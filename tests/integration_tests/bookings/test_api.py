@@ -19,7 +19,6 @@ async def test_add_booking(
     date_to,
     status_code,
     authenticated_ac,
-    db,
 ):
     response = await authenticated_ac.post(
         url="/bookings/create_booking",

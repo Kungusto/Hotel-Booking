@@ -17,13 +17,15 @@ async def test_booking_crud(db: DBManager):
         price=10000,
     )
     new_booking_data = (await db.bookings.add(data_to_add)).model_dump()
-    del new_booking_data["id"] # для теста
+    del new_booking_data["id"]  # для теста
     assert new_booking_data
     assert new_booking_data == data_to_add.model_dump()
 
     # Прочитать
-    booking_data: Booking = (await db.bookings.get_one_or_none(user_id=user_id, room_id=room_id)).model_dump()
-    del booking_data["id"] # для теста
+    booking_data: Booking = (
+        await db.bookings.get_one_or_none(user_id=user_id, room_id=room_id)
+    ).model_dump()
+    del booking_data["id"]  # для теста
     assert booking_data == data_to_add.model_dump()
 
     # Обновить
