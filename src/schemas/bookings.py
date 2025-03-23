@@ -15,6 +15,9 @@ class AddBookings(BaseModel):
     user_id: int
     price: int
 
+class Booking(AddBookings) : 
+    id: int
+
 
 class PATCHBookings(BaseModel):
     room_id: int | None = None

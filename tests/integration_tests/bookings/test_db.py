@@ -1,4 +1,4 @@
-from src.schemas.bookings import AddBookings, PATCHBookings
+from src.schemas.bookings import AddBookings, Booking, PATCHBookings
 from src.utils.dbmanager import DBManager
 from datetime import date
 
@@ -16,13 +16,15 @@ async def test_booking_crud(db: DBManager):
         date_to=date(year=2025, month=1, day=1),
         price=10000,
     )
-    new_booking_data = await db.bookings.add(data_to_add)
+    new_booking_data = (await db.bookings.add(data_to_add)).model_dump()
+    del new_booking_data["id"] # для теста
     assert new_booking_data
-    assert new_booking_data.model_dump() == data_to_add.model_dump()
+    assert new_booking_data == data_to_add.model_dump()
 
     # Прочитать
-    booking_data = await db.bookings.get_one_or_none(user_id=user_id, room_id=room_id)
-    assert booking_data.model_dump() == data_to_add.model_dump()
+    booking_data: Booking = (await db.bookings.get_one_or_none(user_id=user_id, room_id=room_id)).model_dump()
+    del booking_data["id"] # для теста
+    assert booking_data == data_to_add.model_dump()
 
     # Обновить
     data_to_edit = PATCHBookings(

@@ -1,6 +1,7 @@
 # ruff: noqa: E402, F403
 
 # Установка переменной окружения MODE в TEST перед загрузкой настроек
+from typing import Any, AsyncGenerator
 from dotenv import load_dotenv
 import os
 
@@ -24,7 +25,7 @@ from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.models import *
 from src.main import app
 
-settings = Settings()
+settings = Settings() # type: ignore
 
 
 async def get_db_null_pool():
@@ -33,7 +34,7 @@ async def get_db_null_pool():
 
 
 @pytest.fixture(scope="function")
-async def db():
+async def db() -> AsyncGenerator[DBManager, Any]:
     async for db in get_db_null_pool():
         yield db
 
@@ -73,7 +74,7 @@ async def register_user(ac, setup_database):
 
 
 @pytest.fixture(scope="session")
-async def ac():
+async def ac() -> AsyncGenerator[AsyncClient, Any]:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
