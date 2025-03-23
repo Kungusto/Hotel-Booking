@@ -10,31 +10,37 @@ from src.repositories.mappers.base import DataMapper
 from src.schemas.hotels import Hotel
 from src.models.rooms import RoomsOrm
 
-class HotelDataMapper(DataMapper) : 
+
+class HotelDataMapper(DataMapper):
     db_model = HotelsOrm
     schema = Hotel
 
-class RoomDataMapper(DataMapper) : 
+
+class RoomDataMapper(DataMapper):
     db_model = RoomsOrm
     schema = Room
 
-class RoomDataMapperWithRels(DataMapper) :
+
+class RoomDataMapperWithRels(DataMapper):
     db_model = RoomsOrm
     schema = RoomWithRels
 
-class UserDataMapper(DataMapper) : 
+
+class UserDataMapper(DataMapper):
     db_model = UsersOrm
     schema = User
 
-class BookingDataMapper(DataMapper) : 
+
+class BookingDataMapper(DataMapper):
     db_model = BookingsOrm
     schema = AddBookings
-    
-class FacilitiesDataMapper(DataMapper) :
+
+
+class FacilitiesDataMapper(DataMapper):
     db_model = RoomsFacilitiesOrm
     schema = RoomsFacilities
-    
-class UslugiDataMapper(DataMapper) :
+
+
+class UslugiDataMapper(DataMapper):
     db_model = UslugiOrm
     schema = Uslugi
-    

@@ -1,27 +1,25 @@
 import pytest
 
-@pytest.mark.parametrize("email, name, nickname, password, status_code", [
-    ("user@example.com", "John", "Johny312", "12345", 200),
-    ("user@example.com", "John", "Johny312", "12345", 400),
-    ("бу!", "John", "Johny312", "12345", 422),
-])
+
+@pytest.mark.parametrize(
+    "email, name, nickname, password, status_code",
+    [
+        ("user@example.com", "John", "Johny312", "12345", 200),
+        ("user@example.com", "John", "Johny312", "12345", 400),
+        ("бу!", "John", "Johny312", "12345", 422),
+    ],
+)
 async def test_auth(
-        ac,
-        email: int, name: str, nickname: str, password: str, status_code: int
-    ) : 
+    ac, email: int, name: str, nickname: str, password: str, status_code: int
+):
     # /auth/register
     register_response = await ac.post(
         url="/auth/register",
-        json={
-            "email":email,
-            "name":name,
-            "nickname":nickname,
-            "password":password
-        }
+        json={"email": email, "name": name, "nickname": nickname, "password": password},
     )
     # вычисляем какой код должен быть на выходе
     assert register_response.status_code == status_code
-    if status_code != 200 : 
+    if status_code != 200:
         return
     user = register_response.json()["data"]
     assert user
@@ -30,14 +28,13 @@ async def test_auth(
     auth_ac = await ac.post(
         url="/auth/login",
         json={
-            "email":email,
-            "password":password,
-        }
+            "email": email,
+            "password": password,
+        },
     )
     assert auth_ac.status_code == 200
     assert ac.cookies
     assert "access_token" in ac.cookies
-
 
     # /auth/me
     all_bookings = await ac.get(
