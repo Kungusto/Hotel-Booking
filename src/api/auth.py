@@ -25,10 +25,10 @@ async def register_user(data: UserRequestAdd, db: DBDep):
     try:
         hotel = await db.users.add(new_user_data)
         await db.commit()
-    except UserAlreadyExistsException:
+    except UserAlreadyExistsException as ex :
         raise HTTPException(
             status_code=409, detail="Пользователь с таким email уже существует!"
-        )
+        ) from ex
     return {"status": "OK", "data": hotel}
 
 

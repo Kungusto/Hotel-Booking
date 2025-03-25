@@ -31,7 +31,7 @@ class RoomsRepository(BaseRepository):
         return result.scalars().all()
 
     async def get_filtered_by_time(self, hotel_id, date_to, date_from):
-        if date_from > date_to:
+        if date_from >= date_to:
             raise DepartureBeforeArrivalException
         result_request = rooms_ids_for_booking(
             hotel_id=hotel_id, date_from=date_from, date_to=date_to
