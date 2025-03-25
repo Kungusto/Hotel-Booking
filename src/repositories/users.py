@@ -7,6 +7,7 @@ from src.repositories.base import BaseRepository
 from src.models.users import UsersOrm
 from src.schemas.users import UserWithHashedPassword
 from sqlalchemy.exc import IntegrityError
+from asyncpg.exceptions import UniqueViolationError
 
 
 class UsersRepository(BaseRepository):
@@ -23,7 +24,8 @@ class UsersRepository(BaseRepository):
         add_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         try:
             result = await self.session.execute(add_stmt)
-        except IntegrityError:
-            raise UserAlreadyExistsException
+        except IntegrityError as ex:
+            if isinstance(ex.orig.__cause__, UniqueViolationError) :
+                raise UserAlreadyExistsException
         model = result.scalars().first()
         return self.mapper.map_to_domain_entity(model)
