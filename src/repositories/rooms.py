@@ -1,8 +1,12 @@
+from asyncpg import DataError
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import DBAPIError
 from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
+    OutOfRangeException,
+    check_date_to_after_date_from
 )
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
 from src.repositories.utils import rooms_ids_for_booking
@@ -31,8 +35,7 @@ class RoomsRepository(BaseRepository):
         return result.scalars().all()
 
     async def get_filtered_by_time(self, hotel_id, date_to, date_from):
-        if date_from >= date_to:
-            raise DepartureBeforeArrivalException
+        check_date_to_after_date_from(date_from=date_from, date_to=date_to)
         result_request = rooms_ids_for_booking(
             hotel_id=hotel_id, date_from=date_from, date_to=date_to
         )
@@ -53,7 +56,13 @@ class RoomsRepository(BaseRepository):
             .options(joinedload(self.model.facilities))
             .filter_by(**filter_by)
         )
-        result = await self.session.execute(query)
+        try :
+            result = await self.session.execute(query)
+        except DBAPIError as ex :
+            if isinstance(ex.orig.__cause__, DataError) :
+                raise OutOfRangeException       
+            else :
+                raise ex
         model = result.unique().scalars().one_or_none()
         if model is None:
             raise ObjectNotFoundException

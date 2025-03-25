@@ -2,9 +2,9 @@ from typing import Sequence
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
 from src.repositories.mappers.base import DataMapper
-from src.exceptions.exceptions import ObjectNotFoundException, NoChangesException
-from sqlalchemy.exc import NoResultFound, IntegrityError
-
+from src.exceptions.exceptions import ObjectNotFoundException, NoChangesException, OutOfRangeException
+from sqlalchemy.exc import NoResultFound, IntegrityError, DBAPIError
+from asyncpg.exceptions import DataError
 
 class BaseRepository:
     model = None
@@ -42,7 +42,13 @@ class BaseRepository:
         """sqlalchemy.exc.DBAPIError"""
         """sqlalchemy.exc.NoResultFound"""
         query = select(self.model).filter_by(**filter_by)
-        result = await self.session.execute(query)
+        try :
+            result = await self.session.execute(query)
+        except DBAPIError as ex :
+            if isinstance(ex.orig.__cause__, DataError) :
+                raise OutOfRangeException       
+            else :
+                raise ex
         try:
             model = result.scalar_one()
         except NoResultFound:
@@ -51,10 +57,7 @@ class BaseRepository:
 
     async def add(self, data):
         add_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        try:
-            result = await self.session.execute(add_stmt)
-        except IntegrityError:
-            raise ObjectNotFoundException
+        result = await self.session.execute(add_stmt)
         model = result.scalars().first()
         return self.mapper.map_to_domain_entity(model)
 
@@ -71,10 +74,8 @@ class BaseRepository:
         )
         models = await self.session.execute(edit_stmt)
         result = models.scalars().all()
-        if result:
-            return [self.mapper.map_to_domain_entity(model) for model in result]
-        else:
-            raise NoChangesException
+        return [self.mapper.map_to_domain_entity(model) for model in result]
+
 
     async def delete(self, *filter, **filter_by) -> None:
         edit_stmt = (
@@ -85,7 +86,4 @@ class BaseRepository:
         )
         models = await self.session.execute(edit_stmt)
         result = models.scalars().all()
-        if result:
-            return [self.mapper.map_to_domain_entity(model) for model in result]
-        else:
-            raise NoChangesException
+        return [self.mapper.map_to_domain_entity(model) for model in result]

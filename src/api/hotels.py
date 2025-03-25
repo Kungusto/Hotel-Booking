@@ -1,6 +1,7 @@
 from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
+    HotelNotFoundHTTPException
 )
 from datetime import date
 from fastapi import Body, HTTPException, Query, APIRouter
@@ -45,7 +46,7 @@ async def get_hotel(hotel_id: int, db: DBDep):
     try:
         hotel = await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=404, detail="Отель не найден")
+        raise HotelNotFoundHTTPException
     return hotel
 
 

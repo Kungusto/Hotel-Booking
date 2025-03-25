@@ -1,3 +1,7 @@
+from datetime import date
+from fastapi import HTTPException
+
+
 class NabronirovalException(Exception):
     detail = "Неожиданная ошибка"
 
@@ -20,6 +24,32 @@ class UserAlreadyExistsException(NabronirovalException):
 class DepartureBeforeArrivalException(NabronirovalException):
     detail = "Дата выезда раньше даты заезда"
 
+def check_date_to_after_date_from(date_from: date, date_to: date) -> None:
+     if date_to <= date_from:
+        try : 
+            raise DepartureBeforeArrivalException
+        except DepartureBeforeArrivalException as ex :
+            raise HTTPException(status_code=422, detail="Дата заезда не может быть позже даты выезда") from ex
+
 
 class NoChangesException(NabronirovalException):
     detail = "Изменений не замечено"
+
+class OutOfRangeException(NabronirovalException) :
+    detail = "Длина ввода превышает допустимое значение"
+
+
+class NabronirovalHTTPException(HTTPException) :
+    detail = None 
+    status_code = 400
+    
+    def __init__(self)  :
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+class RoomNotFoundHTTPException(NabronirovalHTTPException) :
+    detail = "Номер не найден"
+    status_code = 404
+
+class HotelNotFoundHTTPException(NabronirovalHTTPException) :
+    detail = "Отель не найден"
+    status_code = 404

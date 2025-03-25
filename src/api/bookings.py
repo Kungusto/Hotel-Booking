@@ -4,6 +4,8 @@ from src.api.dependencies import DBDep, GetUserId
 from src.exceptions.exceptions import (
     ObjectNotFoundException,
     AllRoomsAreBookedException,
+    RoomNotFoundHTTPException,
+    check_date_to_after_date_from
 )
 
 router = APIRouter(prefix="/bookings", tags=["Бронирование"])
@@ -11,11 +13,12 @@ router = APIRouter(prefix="/bookings", tags=["Бронирование"])
 
 @router.post("/create_booking")
 async def create_booking(data: AddBookingsFromUser, db: DBDep, user_id: GetUserId):
+    check_date_to_after_date_from(date_from=data.date_from, date_to=data.date_to)
     # Вычисляем цену
     try:
         room = await db.rooms.get_one(id=data.room_id)
-    except ObjectNotFoundException:
-        raise HTTPException(status_code=400, detail="Номер не найден")
+    except ObjectNotFoundException as ex:
+        raise RoomNotFoundHTTPException from ex
     days: int = (data.date_to - data.date_from).days  # на сколько дней забронировано
     price = days * room.price
     # Вызываем специализированный метод на добалвение бронирований
