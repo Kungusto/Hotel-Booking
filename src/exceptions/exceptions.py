@@ -26,10 +26,7 @@ class DepartureBeforeArrivalException(NabronirovalException):
 
 def check_date_to_after_date_from(date_from: date, date_to: date) -> None:
      if date_to <= date_from:
-        try : 
-            raise DepartureBeforeArrivalException
-        except DepartureBeforeArrivalException as ex :
-            raise HTTPException(status_code=422, detail="Дата заезда не может быть позже даты выезда") from ex
+        raise DepartureBeforeArrivalException
 
 
 class NoChangesException(NabronirovalException):

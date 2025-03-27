@@ -1,6 +1,6 @@
 from datetime import timezone, timedelta, datetime
 import jwt
-
+from src.services.base import BaseService
 from passlib.context import CryptContext
 
 from src.config import settings
@@ -9,7 +9,7 @@ from src.config import settings
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-class AuthService:
+class AuthService(BaseService):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def create_access_token(self, data: dict) -> str:

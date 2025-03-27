@@ -1,7 +1,9 @@
+import logging
 from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
-    HotelNotFoundHTTPException
+    HotelNotFoundHTTPException,
+    check_date_to_after_date_from
 )
 from datetime import date
 from fastapi import Body, HTTPException, Query, APIRouter
@@ -9,6 +11,8 @@ from src.schemas.hotels import HotelPATCH, HotelAdd
 from src.api.dependencies import PaginationDep
 from src.api.dependencies import DBDep
 from fastapi_cache.decorator import cache
+from src.services.hotels import HotelSevice
+from src.exceptions.exceptions import DepartureBeforeArrivalException
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -22,20 +26,17 @@ async def get_hotels(
     date_from: date = Query(examples="2025-02-08"),
     date_to: date = Query(examples="2025-02-15"),
 ):
-    try:
-        per_page = pagination.per_page or 5
-        return await db.hotels.get_filtered_by_time(
-            date_from=date_from,
-            date_to=date_to,
-            location=location,
-            title=title,
-            limit=per_page,
-            offset=per_page * (pagination.page - 1),
-        )
-    except DepartureBeforeArrivalException as ex:
-        raise HTTPException(status_code=400, detail=ex.detail)
-
-
+    try :
+        return await HotelSevice(db).get_hotels_filtered_by_time(
+                title=title,
+                location=location,
+                date_from=date_from,
+                date_to=date_to,
+                pagination=pagination,
+            )
+    except DepartureBeforeArrivalException as ex : 
+        raise HTTPException(status_code=422, detail="Дата заезда не может быть позже даты выезда") from ex
+    
 @router.get(
     path="/{hotel_id}",
     description="<h1>Получаем отель по id<h1>",
@@ -44,23 +45,9 @@ async def get_hotels(
 @cache(expire=30)
 async def get_hotel(hotel_id: int, db: DBDep):
     try:
-        hotel = await db.hotels.get_one(id=hotel_id)
+        return await HotelSevice(db).hotel_by_id(hotel_id=hotel_id)
     except ObjectNotFoundException:
         raise HotelNotFoundHTTPException
-    return hotel
-
-
-@router.delete("/delete/{id_hotel}")
-async def delete_hotel(id_hotel: int, db: DBDep):
-    filters = {"id": id_hotel}
-    try:
-        await db.hotels.delete(**filters)
-        await db.commit()
-        return {"status": "OK"}
-    except Exception as e:
-        print(e)
-        return {"status": "Not Found"}
-
 
 @router.post("")
 async def create_hotels(
@@ -81,10 +68,22 @@ async def create_hotels(
         }
     ),
 ):
-    hotel = await db.hotels.add(data=hotel_data)
-    await db.commit()
-
+    hotel = await HotelSevice(db).add_hotel(data=hotel_data)
     return {"status": "OK", "data": hotel}
+
+
+@router.delete("/delete/{id_hotel}")
+async def delete_hotel(id_hotel: int, db: DBDep):
+    filters = {"id": id_hotel}
+    try:
+        await db.hotels.delete(**filters)
+        await db.commit()
+        return {"status": "OK"}
+    except Exception as ex:
+        logging.error(f"Произошла непредвиденная ошибка: {ex}")
+        return {"status": "Not Found"}
+
+
 
 
 @router.put(
