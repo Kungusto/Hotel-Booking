@@ -1,5 +1,6 @@
 from src.services.base import BaseService
 from src.exceptions.exceptions import check_date_to_after_date_from
+from src.schemas.hotels import HotelPATCH
 
 class HotelSevice(BaseService) : 
     async def get_hotels_filtered_by_time(
@@ -28,3 +29,11 @@ class HotelSevice(BaseService) :
         hotel = await self.db.hotels.add(data=data)
         await self.db.commit()
         return hotel
+    
+    async def delete_hotel(self, hotel_id) :
+        await self.db.hotels.delete(id=hotel_id)
+        await self.db.commit()
+        
+    async def patch_and_put_hotel(self, hotel_id, data: HotelPATCH, is_patch: bool = False) : 
+        await self.db.hotels.edit(data=data, is_patch=is_patch, id=hotel_id)
+        await self.db.commit()

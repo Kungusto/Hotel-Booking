@@ -3,6 +3,7 @@ from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
     HotelNotFoundHTTPException,
+    HotelNotFoundException,
     check_date_to_after_date_from
 )
 from datetime import date
@@ -72,19 +73,6 @@ async def create_hotels(
     return {"status": "OK", "data": hotel}
 
 
-@router.delete("/delete/{id_hotel}")
-async def delete_hotel(id_hotel: int, db: DBDep):
-    filters = {"id": id_hotel}
-    try:
-        await db.hotels.delete(**filters)
-        await db.commit()
-        return {"status": "OK"}
-    except Exception as ex:
-        logging.error(f"Произошла непредвиденная ошибка: {ex}")
-        return {"status": "Not Found"}
-
-
-
 
 @router.put(
     path="/{hotel_id}",
@@ -92,16 +80,8 @@ async def delete_hotel(id_hotel: int, db: DBDep):
     description="Тут мы изменяем данные об отеле",
 )
 async def edit_hotels(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
-    filters = {"id": hotel_id}
-
-    try:
-        await db.hotels.edit(hotel_data, **filters)
-        await db.commit()
-        return {"status": "OK"}
-    except Exception as e:
-        print(e)
-        return {"status": "Not Found"}
-
+    await HotelSevice(db).patch_and_put_hotel(hotel_id=hotel_id, hotel_data=hotel_data)
+    return {"status": "OK"}
 
 @router.patch(
     path="/{hotel_id}",
@@ -109,10 +89,10 @@ async def edit_hotels(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
     description="<h1>Тут мы частично изменяем данные об отеле</h1>",
 )
 async def edit_hotels_partialy(hotel_id: int, hotel_data: HotelPATCH, db: DBDep):
-    try:
-        await db.hotels.edit(hotel_data, is_patch=True, id=hotel_id)
-        await db.commit()
-        return {"status": "OK"}
-    except Exception as e:
-        print(e)
-        return {"status": "Not Found"}
+    await HotelSevice(db).patch_and_put_hotel(data=hotel_data, hotel_id=hotel_id, is_patch=True)
+    return {"status": "OK"}
+
+@router.delete("{id_hotel}")
+async def delete_hotel(id_hotel: int, db: DBDep):
+    await HotelSevice(db).delete_hotel(hotel_id=id_hotel)
+    return {"status":"OK"}
