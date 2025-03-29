@@ -37,6 +37,7 @@ async def get_hotels(
     except DepartureBeforeArrivalException as ex : 
         raise HTTPException(status_code=422, detail="Дата заезда не может быть позже даты выезда") from ex
     
+    
 @router.get(
     path="/{hotel_id}",
     description="<h1>Получаем отель по id<h1>",

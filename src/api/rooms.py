@@ -15,11 +15,31 @@ from src.schemas.rooms import (
     PATCHRoomAdd,
     PATCHRoomRequest,
 )
+from src.services.rooms import RoomsService
 from src.schemas.facilities import RoomsFacilitiesAdd
 from src.api.dependencies import DBDep
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 
+
+
+
+@router.get("/{hotel_id}/rooms")
+async def get_rooms_by_hotel(
+    db: DBDep,
+    hotel_id: int,
+    date_from: date = Query(examples="2025-02-10"),
+    date_to: date = Query(examples="2025-02-17"),
+):
+    try:
+        rooms = await RoomsService(db).get_room_by_date_and_hotel(
+            hotel_id=hotel_id,
+            date_from=date_from,
+            date_to=date_to
+        )
+    except DepartureBeforeArrivalException as ex:
+        raise HTTPException(status_code=400, detail=ex.detail) from ex
+    return rooms
 
 @router.post("/create_room")
 async def create_room(
@@ -31,7 +51,6 @@ async def create_room(
         raise HTTPException(status_code=404, detail="Отель не найден") from ex
     except OutOfRangeException as ex :
         raise HTTPException(status_code=400, detail=ex.detail)
-        
     data_to_add = RoomAdd(hotel_id=hotel_id, **data.model_dump())
     room_data = await db.rooms.add(data_to_add)
     dates_for_facilities = [
@@ -42,23 +61,6 @@ async def create_room(
         await db.facilities.add_bulk(dates_for_facilities)
     await db.commit()
     return {"status": "OK", "data": data}
-
-
-@router.get("/{hotel_id}/rooms")
-async def get_rooms_by_hotel(
-    db: DBDep,
-    hotel_id: int,
-    date_from: date = Query(examples="2025-02-10"),
-    date_to: date = Query(examples="2025-02-17"),
-):
-    try:
-        rooms = await db.rooms.get_filtered_by_time(
-            hotel_id=hotel_id, date_from=date_from, date_to=date_to
-        )
-    except DepartureBeforeArrivalException as ex:
-        raise HTTPException(status_code=400, detail=ex.detail) from ex
-    return rooms
-
 
 @router.get("/{hotel_id}/rooms/{room_id}")
 async def get_room_by_id(
