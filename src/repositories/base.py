@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
@@ -78,6 +79,7 @@ class BaseRepository:
 
 
     async def delete(self, *filter, **filter_by) -> None:
+        logging.debug("ЗАПУСК DELETE")
         edit_stmt = (
             delete(self.model)
             .filter(*filter)

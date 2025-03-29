@@ -3,6 +3,5 @@ async def test_facilities_add(ac, db):
     facitilies = await db.uslugi.get_filtered(title="Вай-фай в номере")
     assert response.status_code == 200
     assert facitilies
-
     response = await ac.get(url="/facilities")
     assert response.status_code == 200
