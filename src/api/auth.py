@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Response
 from src.exceptions.exceptions import (
-    UserAlreadyExistsException, 
-    UserAlreadyExistsHTTPException, 
-    UserNotFoundException, 
-    UserNotFoundHTTPException, 
-    WrongPasswordException, 
+    UserAlreadyExistsException,
+    UserAlreadyExistsHTTPException,
+    UserNotFoundException,
+    UserNotFoundHTTPException,
+    WrongPasswordException,
     WrongPasswordHTTPException,
-    ObjectNotFoundException
-    )
+    ObjectNotFoundException,
+)
 from passlib.context import CryptContext
 from src.services.auth import UsersService
 from src.api.dependencies import DBDep
@@ -21,12 +21,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/register")
 async def register_user(data: UserRequestAdd, db: DBDep):
-
     try:
-        hotel = await UsersService(db).register_user(
-            data=data
-        )
-    except UserAlreadyExistsException as ex :
+        hotel = await UsersService(db).register_user(data=data)
+    except UserAlreadyExistsException as ex:
         raise UserAlreadyExistsHTTPException from ex
     await db.commit()
     return {"status": "OK", "data": hotel}
@@ -34,11 +31,11 @@ async def register_user(data: UserRequestAdd, db: DBDep):
 
 @router.post("/login")
 async def login_user(data: UserLogin, response: Response, db: DBDep):
-    try :
-        acces_token = await UsersService(db).login_user(data=data,response=response)
+    try:
+        acces_token = await UsersService(db).login_user(data=data, response=response)
     except UserNotFoundException as ex:
         raise UserNotFoundHTTPException from ex
-    except WrongPasswordException as ex :
+    except WrongPasswordException as ex:
         raise WrongPasswordHTTPException from ex
     except ObjectNotFoundException as ex:
         raise UserNotFoundHTTPException from ex
@@ -47,14 +44,14 @@ async def login_user(data: UserLogin, response: Response, db: DBDep):
 
 @router.get("/me")
 async def get_me(data: UserIdDep, db: DBDep):
-    try :
+    try:
         user = await UsersService(db).get_me_by_cookies(data=data)
     except UserNotFoundException as ex:
         raise UserNotFoundHTTPException from ex
-    except WrongPasswordException as ex :
+    except WrongPasswordException as ex:
         raise WrongPasswordHTTPException from ex
     return user
-    
+
 
 @router.post("/logout")
 async def logout_user(response: Response):

@@ -7,6 +7,7 @@ from src.exceptions.exceptions import ObjectNotFoundException, OutOfRangeExcepti
 from sqlalchemy.exc import NoResultFound, DBAPIError
 from asyncpg.exceptions import DataError
 
+
 class BaseRepository:
     model = None
     mapper: DataMapper = None
@@ -43,12 +44,12 @@ class BaseRepository:
         """sqlalchemy.exc.DBAPIError"""
         """sqlalchemy.exc.NoResultFound"""
         query = select(self.model).filter_by(**filter_by)
-        try :
+        try:
             result = await self.session.execute(query)
-        except DBAPIError as ex :
-            if isinstance(ex.orig.__cause__, DataError) :
-                raise OutOfRangeException       
-            else :
+        except DBAPIError as ex:
+            if isinstance(ex.orig.__cause__, DataError):
+                raise OutOfRangeException
+            else:
                 logging.error("Ошибка не была обработана!")
                 raise ex
         try:
@@ -78,7 +79,6 @@ class BaseRepository:
         models = await self.session.execute(edit_stmt)
         result = models.scalars().all()
         return [self.mapper.map_to_domain_entity(model) for model in result]
-
 
     async def delete(self, *filter, **filter_by) -> None:
         edit_stmt = (

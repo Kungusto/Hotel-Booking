@@ -1,7 +1,11 @@
 from datetime import timezone, timedelta, datetime
 import jwt
 from sqlalchemy.exc import NoResultFound
-from src.exceptions.exceptions import ObjectNotFoundException, UserNotFoundException, WrongPasswordException
+from src.exceptions.exceptions import (
+    ObjectNotFoundException,
+    UserNotFoundException,
+    WrongPasswordException,
+)
 from src.services.base import BaseService
 from passlib.context import CryptContext
 from src.config import settings
@@ -10,11 +14,9 @@ from src.schemas.users import UserAdd
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-class UsersService(BaseService) : 
-    async def register_user(
-        self,
-        data: UserAdd
-    ) :
+
+class UsersService(BaseService):
+    async def register_user(self, data: UserAdd):
         hashedpassword = AuthService().hash_password(data.password)
         new_user_data = UserAdd(
             email=data.email,
@@ -24,12 +26,8 @@ class UsersService(BaseService) :
         )
         return await self.db.users.add(new_user_data)
 
-    async def login_user(
-            self, 
-            data,
-            response
-    ) :
-        try :
+    async def login_user(self, data, response):
+        try:
             user = await self.db.users.get_user_with_hashed_password(email=data.email)
         except NoResultFound as ex:
             raise UserNotFoundException from ex
@@ -38,16 +36,14 @@ class UsersService(BaseService) :
         acces_token = AuthService().create_access_token({"user_id": user.id})
         response.set_cookie(key="access_token", value=acces_token)
         return acces_token
-    
-    async def get_me_by_cookies(
-            self,
-            data
-    ) :
-        try :
+
+    async def get_me_by_cookies(self, data):
+        try:
             user = await self.db.users.get_one(id=data["user_id"])
-        except ObjectNotFoundException as ex: 
+        except ObjectNotFoundException as ex:
             raise UserNotFoundException from ex
         return user
+
 
 class AuthService(BaseService):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

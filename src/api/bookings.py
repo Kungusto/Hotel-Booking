@@ -5,7 +5,7 @@ from src.exceptions.exceptions import (
     RoomNotFoundHTTPException,
     DepartureBeforeArrivalException,
     DepartureBeforeArrivalHTTPException,
-    AllRoomsAreBookedHTTPException
+    AllRoomsAreBookedHTTPException,
 )
 from src.services.bookings import BookingService
 from fastapi import APIRouter
@@ -16,16 +16,19 @@ router = APIRouter(prefix="/bookings", tags=["Бронирование"])
 
 @router.post("/create_booking")
 async def create_booking(data: AddBookingsFromUser, db: DBDep, user_id: GetUserId):
-    try :
-        bookings_returned = await BookingService(db).create_booking(data=data, user_id=user_id)
+    try:
+        bookings_returned = await BookingService(db).create_booking(
+            data=data, user_id=user_id
+        )
     except DepartureBeforeArrivalException as ex:
-        raise DepartureBeforeArrivalHTTPException from ex 
-    except RoomNotFoundException as ex :
+        raise DepartureBeforeArrivalHTTPException from ex
+    except RoomNotFoundException as ex:
         raise RoomNotFoundHTTPException from ex
-    except AllRoomsAreBookedException as ex :
+    except AllRoomsAreBookedException as ex:
         raise AllRoomsAreBookedHTTPException from ex
     await db.commit()
     return {"status": "OK", "data": bookings_returned}
+
 
 @router.get("/me")
 async def get_my_bookings(user_id: GetUserId, db: DBDep):

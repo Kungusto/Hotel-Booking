@@ -5,7 +5,7 @@ from sqlalchemy.exc import DBAPIError, NoResultFound
 from src.exceptions.exceptions import (
     ObjectNotFoundException,
     OutOfRangeException,
-    check_date_to_after_date_from
+    check_date_to_after_date_from,
 )
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataMapperWithRels
 from src.repositories.utils import rooms_ids_for_booking
@@ -55,14 +55,14 @@ class RoomsRepository(BaseRepository):
             .options(joinedload(self.model.facilities))
             .filter_by(**filter_by)
         )
-        try :
+        try:
             result = await self.session.execute(query)
-        except DBAPIError as ex :
-            if isinstance(ex.orig.__cause__, DataError) :
-                raise OutOfRangeException       
-            else :
+        except DBAPIError as ex:
+            if isinstance(ex.orig.__cause__, DataError):
+                raise OutOfRangeException
+            else:
                 raise ex
-        try :
+        try:
             model = result.unique().scalar_one()
         except NoResultFound as ex:
             raise ObjectNotFoundException from ex

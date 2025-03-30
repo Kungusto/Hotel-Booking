@@ -20,6 +20,7 @@ from fastapi_cache.backends.redis import RedisBackend
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_manager.connect()

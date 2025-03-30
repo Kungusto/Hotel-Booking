@@ -26,11 +26,15 @@ class UsersRepository(BaseRepository):
         try:
             result = await self.session.execute(add_stmt)
         except IntegrityError as ex:
-            if isinstance(ex.orig.__cause__, UniqueViolationError) :
-                logging.error(f"Не удалось записать в БД данные. Входные данные: {data}. Тип ошибки: {ex.orig.__cause__}")
+            if isinstance(ex.orig.__cause__, UniqueViolationError):
+                logging.error(
+                    f"Не удалось записать в БД данные. Входные данные: {data}. Тип ошибки: {ex.orig.__cause__}"
+                )
                 raise UserAlreadyExistsException
-            else : 
-                logging.error(f"Неизвестная ошибка: не удалось записать в БД данные. Входные данные: {data}. Тип ошибки: {ex.orig.__cause__}")
+            else:
+                logging.error(
+                    f"Неизвестная ошибка: не удалось записать в БД данные. Входные данные: {data}. Тип ошибки: {ex.orig.__cause__}"
+                )
                 raise ex
         model = result.scalars().first()
         return self.mapper.map_to_domain_entity(model)
