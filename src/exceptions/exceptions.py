@@ -101,6 +101,8 @@ class UserNotFoundHTTPException(ObjectNotFoundHTTPException):
 
 # -------------------------
 
+class EmailNotRegistratedHTTPException(NabronirovalHTTPException) : 
+    detail = "Этот E-mail не зарегестрирован"
 
 class OutOfRangeHTTPException(NabronirovalHTTPException):
     detail = "Длина ввода превышает допустимое значение"

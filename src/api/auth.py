@@ -7,6 +7,7 @@ from src.exceptions.exceptions import (
     WrongPasswordException,
     WrongPasswordHTTPException,
     ObjectNotFoundException,
+    EmailNotRegistratedHTTPException
 )
 from passlib.context import CryptContext
 from src.services.auth import UsersService
@@ -34,7 +35,7 @@ async def login_user(data: UserLogin, response: Response, db: DBDep):
     try:
         acces_token = await UsersService(db).login_user(data=data, response=response)
     except UserNotFoundException as ex:
-        raise UserNotFoundHTTPException from ex
+        raise EmailNotRegistratedHTTPException from ex
     except WrongPasswordException as ex:
         raise WrongPasswordHTTPException from ex
     except ObjectNotFoundException as ex:
