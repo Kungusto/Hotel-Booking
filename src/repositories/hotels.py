@@ -1,4 +1,4 @@
-from src.exceptions.exceptions import DepartureBeforeArrivalException, check_date_to_after_date_from
+from src.exceptions.exceptions import check_date_to_after_date_from
 from datetime import date
 from sqlalchemy import select, func
 from src.repositories.utils import rooms_ids_for_booking

@@ -1,10 +1,7 @@
-from fastapi import HTTPException
 from src.services.base import BaseService
 from src.schemas.bookings import AddBookingsFromUser, AddBookings
 from src.exceptions.exceptions import (
     ObjectNotFoundException,
-    AllRoomsAreBookedException,
-    RoomNotFoundHTTPException,
     RoomNotFoundException,
     check_date_to_after_date_from
 )

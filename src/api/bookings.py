@@ -1,17 +1,15 @@
-from fastapi import APIRouter, HTTPException
-from src.schemas.bookings import AddBookingsFromUser, AddBookings
 from src.api.dependencies import DBDep, GetUserId
 from src.exceptions.exceptions import (
-    ObjectNotFoundException,
     AllRoomsAreBookedException,
     RoomNotFoundException,
     RoomNotFoundHTTPException,
-    check_date_to_after_date_from,
     DepartureBeforeArrivalException,
     DepartureBeforeArrivalHTTPException,
     AllRoomsAreBookedHTTPException
 )
 from src.services.bookings import BookingService
+from fastapi import APIRouter
+from src.schemas.bookings import AddBookingsFromUser
 
 router = APIRouter(prefix="/bookings", tags=["Бронирование"])
 
@@ -23,7 +21,7 @@ async def create_booking(data: AddBookingsFromUser, db: DBDep, user_id: GetUserI
     except DepartureBeforeArrivalException as ex:
         raise DepartureBeforeArrivalHTTPException from ex 
     except RoomNotFoundException as ex :
-        raise RoomNotFoundHTTPException
+        raise RoomNotFoundHTTPException from ex
     except AllRoomsAreBookedException as ex :
         raise AllRoomsAreBookedHTTPException from ex
     await db.commit()

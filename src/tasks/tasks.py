@@ -16,7 +16,6 @@ def test_task():
 
 @celery_instance.task
 def resize_image(image_path: str):
-    logging.debug(f"resize_image начинает свою работу")
     sizes = [1000, 500, 200]
     output_folder = "src/static/images"
     img = Image.open(image_path)

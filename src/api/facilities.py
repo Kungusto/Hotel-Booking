@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from src.api.dependencies import DBDep
 from fastapi_cache.decorator import cache
 from src.schemas.facilities import UslugiAdd
-from src.tasks.tasks import test_task
 from src.services.facilities import FacilitiesService
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])

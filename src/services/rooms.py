@@ -4,10 +4,8 @@ from sqlalchemy.exc import IntegrityError, DataError, DBAPIError
 from asyncpg.exceptions import ForeignKeyViolationError
 from src.services.base import BaseService 
 from src.exceptions.exceptions import (
-    DepartureBeforeArrivalException, 
     UslugiNotFoundException, 
     ObjectNotFoundException, 
-    NoChangesException,
     RoomNotFoundException,
     HotelNotFoundException,
     RoomHasBookingsError,

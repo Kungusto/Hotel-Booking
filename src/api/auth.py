@@ -1,5 +1,4 @@
-import logging
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Response
 from src.exceptions.exceptions import (
     UserAlreadyExistsException, 
     UserAlreadyExistsHTTPException, 
@@ -10,12 +9,10 @@ from src.exceptions.exceptions import (
     ObjectNotFoundException
     )
 from passlib.context import CryptContext
-from src.services.auth import AuthService, UsersService
+from src.services.auth import UsersService
 from src.api.dependencies import DBDep
-from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
+from src.schemas.users import UserRequestAdd, UserLogin
 from src.api.dependencies import UserIdDep
-from src.repositories.users import UsersRepository
-from src.database import async_session_maker
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 

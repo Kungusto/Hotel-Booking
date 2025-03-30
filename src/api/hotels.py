@@ -1,10 +1,7 @@
-import logging
 from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
     HotelNotFoundHTTPException,
-    HotelNotFoundException,
-    check_date_to_after_date_from
 )
 from datetime import date
 from fastapi import Body, HTTPException, Query, APIRouter
@@ -13,7 +10,6 @@ from src.api.dependencies import PaginationDep
 from src.api.dependencies import DBDep
 from fastapi_cache.decorator import cache
 from src.services.hotels import HotelSevice
-from src.exceptions.exceptions import DepartureBeforeArrivalException
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 

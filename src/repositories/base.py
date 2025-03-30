@@ -3,8 +3,8 @@ from typing import Sequence
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
 from src.repositories.mappers.base import DataMapper
-from src.exceptions.exceptions import ObjectNotFoundException, NoChangesException, OutOfRangeException
-from sqlalchemy.exc import NoResultFound, IntegrityError, DBAPIError
+from src.exceptions.exceptions import ObjectNotFoundException, OutOfRangeException
+from sqlalchemy.exc import NoResultFound, DBAPIError
 from asyncpg.exceptions import DataError
 
 class BaseRepository:

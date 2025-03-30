@@ -3,7 +3,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import DBAPIError, NoResultFound
 from src.exceptions.exceptions import (
-    DepartureBeforeArrivalException,
     ObjectNotFoundException,
     OutOfRangeException,
     check_date_to_after_date_from

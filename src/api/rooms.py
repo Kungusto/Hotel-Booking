@@ -18,15 +18,11 @@ from src.exceptions.exceptions import (
     RoomHasBookingsHTTPException
 )
 from src.schemas.rooms import (
-    RoomAdd,
     RoomAddRequest,
     PUTRoom,
-    PUTRoomAdd,
-    PATCHRoomAdd,
     PATCHRoomRequest,
 )
 from src.services.rooms import RoomsService
-from src.schemas.facilities import RoomsFacilitiesAdd
 from src.api.dependencies import DBDep
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])

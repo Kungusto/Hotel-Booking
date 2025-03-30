@@ -1,7 +1,6 @@
 from datetime import timezone, timedelta, datetime
-import logging
 import jwt
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import NoResultFound
 from src.exceptions.exceptions import ObjectNotFoundException, UserNotFoundException, WrongPasswordException
 from src.services.base import BaseService
 from passlib.context import CryptContext
