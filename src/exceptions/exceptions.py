@@ -62,7 +62,7 @@ class NabronirovalHTTPException(HTTPException) :
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 class DepartureBeforeArrivalHTTPException(NabronirovalHTTPException) :
-    detail = "Длина ввода превышает допустимое значение"
+    detail = "Выезд не может быть раньше заезда и наоборот"
 
 # --- Not Found Excpetions
 class ObjectNotFoundHTTPException(NabronirovalHTTPException) :
@@ -99,3 +99,7 @@ class UserAlreadyExistsHTTPException(NabronirovalHTTPException) :
 class WrongPasswordHTTPException(NabronirovalHTTPException) :
     status_code = 401
     detail = "Неверный пароль"
+
+class AllRoomsAreBookedHTTPException(NabronirovalHTTPException) :
+    status_code = 409
+    detail = "На данный момент нет свободных номеров"
