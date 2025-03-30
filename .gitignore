@@ -6,7 +6,6 @@ __pycache__
 .codegpt
 i.webp
 src/migrations/versions
-env.py
 script.by.mako
 src/alembic.ini
 src/static/images/*
