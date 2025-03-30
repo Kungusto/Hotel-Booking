@@ -5,7 +5,7 @@ __pycache__
 .env
 .codegpt
 i.webp
-src/migrations
+src/migrations/versions
 env.py
 script.by.mako
 src/alembic.ini
