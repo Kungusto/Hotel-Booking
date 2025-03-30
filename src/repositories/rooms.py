@@ -1,7 +1,7 @@
 from asyncpg import DataError
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, NoResultFound
 from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
@@ -63,7 +63,8 @@ class RoomsRepository(BaseRepository):
                 raise OutOfRangeException       
             else :
                 raise ex
-        model = result.unique().scalars().one_or_none()
-        if model is None:
-            raise ObjectNotFoundException
+        try :
+            model = result.unique().scalar_one()
+        except NoResultFound as ex:
+            raise ObjectNotFoundException from ex
         return RoomDataMapperWithRels.map_to_domain_entity(model)

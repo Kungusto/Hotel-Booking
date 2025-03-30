@@ -1,13 +1,13 @@
 import logging
 from sqlalchemy import insert, select
 from pydantic import EmailStr
-from src.exceptions.exceptions import UserAlreadyExistsException
+from src.exceptions.exceptions import UserAlreadyExistsException, ObjectNotFoundException
 from src.repositories.mappers.mappers import UserDataMapper
 from src.repositories.mappers.base import DataMapper
 from src.repositories.base import BaseRepository
 from src.models.users import UsersOrm
 from src.schemas.users import UserWithHashedPassword
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from asyncpg.exceptions import UniqueViolationError
 
 

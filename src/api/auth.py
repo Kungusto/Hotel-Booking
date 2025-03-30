@@ -1,7 +1,16 @@
+import logging
 from fastapi import APIRouter, HTTPException, Response
-from src.exceptions.exceptions import UserAlreadyExistsException
+from src.exceptions.exceptions import (
+    UserAlreadyExistsException, 
+    UserAlreadyExistsHTTPException, 
+    UserNotFoundException, 
+    UserNotFoundHTTPException, 
+    WrongPasswordException, 
+    WrongPasswordHTTPException,
+    ObjectNotFoundException
+    )
 from passlib.context import CryptContext
-from src.services.auth import AuthService
+from src.services.auth import AuthService, UsersService
 from src.api.dependencies import DBDep
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
 from src.api.dependencies import UserIdDep
@@ -15,43 +24,40 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/register")
 async def register_user(data: UserRequestAdd, db: DBDep):
-    hashedpassword = AuthService().hash_password(data.password)
-    new_user_data = UserAdd(
-        email=data.email,
-        hashedpassword=hashedpassword,
-        name=data.name,
-        nickname=data.nickname,
-    )
+
     try:
-        hotel = await db.users.add(new_user_data)
-        await db.commit()
+        hotel = await UsersService(db).register_user(
+            data=data
+        )
     except UserAlreadyExistsException as ex :
-        raise HTTPException(
-            status_code=409, detail="Пользователь с таким email уже существует!"
-        ) from ex
+        raise UserAlreadyExistsHTTPException from ex
+    await db.commit()
     return {"status": "OK", "data": hotel}
 
 
 @router.post("/login")
 async def login_user(data: UserLogin, response: Response, db: DBDep):
-    user = await db.users.get_user_with_hashed_password(email=data.email)
-    if not user:
-        raise HTTPException(
-            status_code=401, detail="Пользователя с таким email не существует"
-        )
-    if not AuthService().verify_password(data.password, user.hashedpassword):
-        raise HTTPException(status_code=401, detail="Неверный пароль")
-    acces_token = AuthService().create_access_token({"user_id": user.id})
-    response.set_cookie(key="access_token", value=acces_token)
+    try :
+        acces_token = await UsersService(db).login_user(data=data,response=response)
+    except UserNotFoundException as ex:
+        raise UserNotFoundHTTPException from ex
+    except WrongPasswordException as ex :
+        raise WrongPasswordHTTPException from ex
+    except ObjectNotFoundException as ex:
+        raise UserNotFoundHTTPException from ex
     return {"acces_token": acces_token}
 
 
 @router.get("/me")
-async def get_me(data: UserIdDep):
-    async with async_session_maker() as session:
-        user = await UsersRepository(session).get_one_or_none(id=data["user_id"])
-        return user
-
+async def get_me(data: UserIdDep, db: DBDep):
+    try :
+        user = await UsersService(db).get_me_by_cookies(data=data)
+    except UserNotFoundException as ex:
+        raise UserNotFoundHTTPException from ex
+    except WrongPasswordException as ex :
+        raise WrongPasswordHTTPException from ex
+    return user
+    
 
 @router.post("/logout")
 async def logout_user(response: Response):

@@ -49,10 +49,12 @@ class BaseRepository:
             if isinstance(ex.orig.__cause__, DataError) :
                 raise OutOfRangeException       
             else :
+                logging.error("Ошибка не была обработана!")
                 raise ex
         try:
             model = result.scalar_one()
         except NoResultFound:
+            logging.error("Объект не найден")
             raise ObjectNotFoundException
         return self.mapper.map_to_domain_entity(model)
 
@@ -79,7 +81,6 @@ class BaseRepository:
 
 
     async def delete(self, *filter, **filter_by) -> None:
-        logging.debug("ЗАПУСК DELETE")
         edit_stmt = (
             delete(self.model)
             .filter(*filter)

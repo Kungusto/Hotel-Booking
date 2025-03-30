@@ -8,7 +8,7 @@ class NabronirovalException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(self.detail, *args, **kwargs)
 
-
+# --- Not Found Exceptions
 class ObjectNotFoundException(NabronirovalException):
     detail = "Объект не найден"
     
@@ -17,6 +17,16 @@ class HotelNotFoundException(ObjectNotFoundException) :
     
 class RoomNotFoundException(ObjectNotFoundException) :
     detail = "Номер не найден"
+
+class UslugiNotFoundException(ObjectNotFoundException) :
+    detail = "Удобство не найдено"
+
+class UserNotFoundException(ObjectNotFoundException) :
+    detail = "Пользователь не найден"
+# --------------
+
+class WrongPasswordException(NabronirovalException) :
+    detail = "Неверный пароль"
 
 class AllRoomsAreBookedException(NabronirovalException):
     detail = "Не осталось свободных номеров"
@@ -28,6 +38,9 @@ class UserAlreadyExistsException(NabronirovalException):
 
 class DepartureBeforeArrivalException(NabronirovalException):
     detail = "Дата выезда раньше даты заезда"
+
+class RoomHasBookingsError(NabronirovalException) :
+    detail = "На номер уже есть бронирования"
 
 def check_date_to_after_date_from(date_from: date, date_to: date) -> None:
      if date_to <= date_from:
@@ -48,10 +61,41 @@ class NabronirovalHTTPException(HTTPException) :
     def __init__(self)  :
         super().__init__(status_code=self.status_code, detail=self.detail)
 
-class RoomNotFoundHTTPException(NabronirovalHTTPException) :
-    detail = "Номер не найден"
+class DepartureBeforeArrivalHTTPException(NabronirovalHTTPException) :
+    detail = "Длина ввода превышает допустимое значение"
+
+# --- Not Found Excpetions
+class ObjectNotFoundHTTPException(NabronirovalHTTPException) :
     status_code = 404
 
-class HotelNotFoundHTTPException(NabronirovalHTTPException) :
+
+class RoomNotFoundHTTPException(ObjectNotFoundHTTPException) :
+    detail = "Номер не найден"
+
+class HotelNotFoundHTTPException(ObjectNotFoundHTTPException) :
     detail = "Отель не найден"
-    status_code = 404
+
+class UslugiNotFoundHTTPException(ObjectNotFoundHTTPException) :
+    detail = "Услуга не найдена"
+
+class UserNotFoundHTTPException(ObjectNotFoundHTTPException) :
+    detail = "Пользователь не найден"
+# -------------------------
+
+class OutOfRangeHTTPException(NabronirovalHTTPException) :
+    detail = "Длина ввода превышает допустимое значение"
+
+class RoomHasBookingsHTTPException(NabronirovalHTTPException) : 
+    detail = "На номер уже существуют бронирования!"
+
+class InternalServerErrorHTTPException(NabronirovalHTTPException) :
+    status_code = 500
+    detail = "На стороне сервера произошла непредвиденная ошибка"
+
+class UserAlreadyExistsHTTPException(NabronirovalHTTPException) :
+    status_code = 409
+    detail = "Пользователь с этим email уже существует"
+
+class WrongPasswordHTTPException(NabronirovalHTTPException) :
+    status_code = 401
+    detail = "Неверный пароль"
