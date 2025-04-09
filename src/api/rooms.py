@@ -56,10 +56,10 @@ async def create_room(
         await RoomsService(db).add_room_with_rels(hotel_id=hotel_id, data=data)
     except UslugiNotFoundException as ex:
         raise UslugiNotFoundHTTPException from ex
-    except ObjectNotFoundException as ex:
-        raise ObjectNotFoundException from ex
     except OutOfRangeException as ex:
         raise OutOfRangeHTTPException from ex
+    except HotelNotFoundException as ex :
+        raise HotelNotFoundHTTPException from ex
     except Exception as ex:
         logging.error(f"!! НЕПРЕДВИДЕННАЯ Ошибка: {type(ex).__name__}")
         logging.exception(ex)

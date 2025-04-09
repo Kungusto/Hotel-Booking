@@ -37,6 +37,9 @@ class RoomsService(BaseService):
     async def add_room_with_rels(self, hotel_id: int, data: RoomAddRequest):
         try:
             await self.db.hotels.get_one(id=hotel_id)
+        except ObjectNotFoundException as ex :
+            raise HotelNotFoundException from ex
+        try:
             data_to_add = RoomAdd(hotel_id=hotel_id, **data.model_dump())
             room_data = await self.db.rooms.add(data_to_add)
             dates_for_facilities = [
