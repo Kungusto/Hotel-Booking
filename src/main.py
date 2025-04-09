@@ -18,12 +18,13 @@ from src.api.images import router as router_images
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_manager.connect()
+    logging.info("Успешное подключение к redis")
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
     logging.info("FastAPI cache initialized")
     yield
@@ -40,4 +41,4 @@ app.include_router(router_facilities)
 app.include_router(router_images)
 
 if __name__ == "__main__":
-    uvicorn.run(app)
+    uvicorn.run("main:app", reload=True, host="0.0.0.0")
