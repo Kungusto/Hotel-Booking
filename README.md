@@ -30,3 +30,7 @@ docker run --name celery_beat `
     celery --app=src.tasks.celery_app:celery_instance worker -l INFO -B --pool=solo
 
 docker build -t bookings_image .    
+
+
+--volume etc/letsencrypt:etc/letsencrypt
+--volume var/lib/letsencrypt
