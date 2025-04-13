@@ -25,9 +25,12 @@ class RoomsService(BaseService):
     async def get_room_by_date_and_hotel(
         self, date_from: datetime, date_to: datetime, hotel_id: int
     ):
-        return await self.db.rooms.get_filtered_by_time(
-            hotel_id=hotel_id, date_from=date_from, date_to=date_to
-        )
+        try :
+            return await self.db.rooms.get_filtered_by_time(
+                hotel_id=hotel_id, date_from=date_from, date_to=date_to
+            )
+        except OutOfRangeException as ex :
+            raise
 
     async def get_room_by_id(self, hotel_id: int, room_id: int):
         return await self.db.rooms.get_one_or_none_with_rels(

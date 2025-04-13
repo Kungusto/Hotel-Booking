@@ -41,6 +41,8 @@ async def get_rooms_by_hotel(
         )
     except DepartureBeforeArrivalException as ex:
         raise DepartureBeforeArrivalHTTPException from ex
+    except OutOfRangeException as ex :
+        raise OutOfRangeHTTPException from ex
     except Exception as ex:
         logging.error(f"!! НЕПРЕДВИДЕННАЯ Ошибка: {type(ex).__name__}")
         logging.exception(ex)

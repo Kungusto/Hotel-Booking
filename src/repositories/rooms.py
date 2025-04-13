@@ -2,6 +2,7 @@ from asyncpg import DataError
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import DBAPIError, NoResultFound
+# from asyncpg.exceptions import Out
 from src.exceptions.exceptions import (
     ObjectNotFoundException,
     OutOfRangeException,
@@ -43,7 +44,13 @@ class RoomsRepository(BaseRepository):
             .options(joinedload(self.model.facilities))
             .filter(RoomsOrm.id.in_(result_request))
         )
-        result = await self.session.execute(query)
+        try :
+            result = await self.session.execute(query)
+        except DBAPIError as ex:
+            if isinstance(ex.orig.__cause__, DataError):
+                raise OutOfRangeException
+            else:
+                raise ex
         return [
             RoomDataMapperWithRels.map_to_domain_entity(model)
             for model in result.unique().scalars().all()
