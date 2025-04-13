@@ -162,4 +162,5 @@ class InternalServerErrorHTTPException(NabronirovalHTTPException):
     detail = "На стороне сервера произошла непредвиденная ошибка"
 
 class ExpiredTokenHTTPException(NabronirovalHTTPException) :
+    status_code = 401
     detail = "Срок действия токена истек"
