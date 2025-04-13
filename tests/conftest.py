@@ -66,9 +66,7 @@ async def register_user(ac, setup_database):
         url="/auth/register",
         json={
             "email": "John@example.com",
-            "nickname": "John",
-            "name": "John",
-            "password": "John",
+            "password": "JohnyCool_2010",
         },
     )
 
@@ -84,6 +82,6 @@ async def ac() -> AsyncGenerator[AsyncClient, Any]:
 @pytest.fixture(scope="session")
 async def authenticated_ac(register_user, ac: AsyncClient):
     await ac.post(
-        url="/auth/login", json={"email": "John@example.com", "password": "John"}
+        url="/auth/login", json={"email": "John@example.com", "password": "JohnyCool_2010"}
     )
     yield ac

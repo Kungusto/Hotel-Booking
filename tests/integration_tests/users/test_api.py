@@ -2,20 +2,20 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "email, name, nickname, password, status_code",
+    "email, password, status_code",
     [
-        ("user@example.com", "John", "Johny312", "12345", 200),
-        ("user@example.com", "John", "Johny312", "12345", 409),
-        ("бу!", "John", "Johny312", "12345", 422),
+        ("user1@example.com", "Crazy_slon_999", 200),
+        ("user1@example.com", "Crazy_slon_999", 409),
+        ("бу!", "12345", 422),
     ],
 )
 async def test_auth(
-    ac, email: int, name: str, nickname: str, password: str, status_code: int
+    ac, email: int, password: str, status_code: int
 ):
     # /auth/register
     register_response = await ac.post(
         url="/auth/register",
-        json={"email": email, "name": name, "nickname": nickname, "password": password},
+        json={"email": email, "password": password},
     )
     # вычисляем какой код должен быть на выходе
     assert register_response.status_code == status_code
