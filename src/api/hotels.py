@@ -2,6 +2,9 @@ from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     ObjectNotFoundException,
     HotelNotFoundHTTPException,
+    HotelAlreadyExistsHTTPException,
+    HotelAlreadyExistsException,
+    HotelNotFoundException
 )
 from datetime import date
 from fastapi import Body, HTTPException, Query, APIRouter
@@ -69,7 +72,10 @@ async def create_hotels(
         }
     ),
 ):
-    hotel = await HotelSevice(db).add_hotel(data=hotel_data)
+    try :
+        hotel = await HotelSevice(db).add_hotel(data=hotel_data)
+    except HotelAlreadyExistsException as ex :
+        raise HotelAlreadyExistsHTTPException from ex
     return {"status": "OK", "data": hotel}
 
 
@@ -79,7 +85,10 @@ async def create_hotels(
     description="Тут мы изменяем данные об отеле",
 )
 async def edit_hotels(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
-    await HotelSevice(db).patch_and_put_hotel(hotel_id=hotel_id, hotel_data=hotel_data)
+    try :
+        await HotelSevice(db).patch_and_put_hotel(hotel_id=hotel_id, data=hotel_data)
+    except HotelNotFoundException as ex :
+        raise HotelNotFoundHTTPException from ex
     return {"status": "OK"}
 
 
@@ -89,13 +98,19 @@ async def edit_hotels(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
     description="<h1>Тут мы частично изменяем данные об отеле</h1>",
 )
 async def edit_hotels_partialy(hotel_id: int, hotel_data: HotelPATCH, db: DBDep):
-    await HotelSevice(db).patch_and_put_hotel(
-        data=hotel_data, hotel_id=hotel_id, is_patch=True
-    )
+    try :
+        await HotelSevice(db).patch_and_put_hotel(
+            data=hotel_data, hotel_id=hotel_id, is_patch=True
+        )
+    except HotelNotFoundException as ex :
+        raise HotelNotFoundHTTPException from ex
     return {"status": "OK"}
 
 
 @router.delete("{id_hotel}")
 async def delete_hotel(id_hotel: int, db: DBDep):
-    await HotelSevice(db).delete_hotel(hotel_id=id_hotel)
+    try :
+        await HotelSevice(db).delete_hotel(hotel_id=id_hotel)
+    except HotelNotFoundException as ex :
+        raise HotelNotFoundHTTPException from ex
     return {"status": "OK"}

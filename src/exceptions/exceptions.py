@@ -29,7 +29,6 @@ class UslugiNotFoundException(ObjectNotFoundException):
 class UserNotFoundException(ObjectNotFoundException):
     detail = "Пользователь не найден"
 
-
 # --------------
 
 
@@ -44,6 +43,8 @@ class AllRoomsAreBookedException(NabronirovalException):
 class UserAlreadyExistsException(NabronirovalException):
     detail = "Пользователь уже существует"
 
+class HotelAlreadyExistsException(NabronirovalException) :
+    detail = "Указанный отель уже существует, либо указан не тот адрес"
 
 class DepartureBeforeArrivalException(NabronirovalException):
     detail = "Дата выезда раньше даты заезда"
@@ -65,7 +66,9 @@ class NoChangesException(NabronirovalException):
 class OutOfRangeException(NabronirovalException):
     detail = "Длина ввода превышает допустимое значение"
 
+# ---------------------------------------------------------------------------------
 
+# - HTTP exceptions -
 class NabronirovalHTTPException(HTTPException):
     detail = None
     status_code = 400
@@ -97,36 +100,61 @@ class UslugiNotFoundHTTPException(ObjectNotFoundHTTPException):
 
 class UserNotFoundHTTPException(ObjectNotFoundHTTPException):
     detail = "Пользователь не найден"
-
-
 # -------------------------
 
 class EmailNotRegistratedHTTPException(NabronirovalHTTPException) : 
     detail = "Этот E-mail не зарегестрирован"
 
+
+# ------------------------- Валидация
+class EmptyTitleFacility(NabronirovalHTTPException) :
+    detail = "Название удобства должно быть длиннее одного символа"
+
 class OutOfRangeHTTPException(NabronirovalHTTPException):
     detail = "Длина ввода превышает допустимое значение"
 
+class TooShortPasswordHTTPException(NabronirovalHTTPException) :
+    status_code = 422
+    detail = "Длина пароля должна быть меньше 12 символов"
+
+class TooLongPasswordHTTPException(NabronirovalHTTPException) :
+    status_code = 422
+    detail = "Длина пароля должна быть больше 32 символов"
+
+class TooShortTitleHTTPException(NabronirovalHTTPException) :
+    status_code = 422
+    detail = "Название отеля должно быть длиннее одного символа"
+
+class TooShortLocationHTTPException(NabronirovalHTTPException) :
+    status_code = 422
+    detail = "Адрес отеля должен быть длиннее одного символа"
+# -------------------------
+
+# ------------------------- Already Exists и все в этой манере
+class HotelAlreadyExistsHTTPException(NabronirovalHTTPException) :
+    status_code = 409
+    detail = "Такой отель уже существует, либо вы указали не тот адрес"
 
 class RoomHasBookingsHTTPException(NabronirovalHTTPException):
     detail = "На номер уже существуют бронирования!"
-
-
-class InternalServerErrorHTTPException(NabronirovalHTTPException):
-    status_code = 500
-    detail = "На стороне сервера произошла непредвиденная ошибка"
-
 
 class UserAlreadyExistsHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "Пользователь с этим email уже существует"
 
-
 class WrongPasswordHTTPException(NabronirovalHTTPException):
     status_code = 401
     detail = "Неверный пароль"
 
-
 class AllRoomsAreBookedHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "На данный момент нет свободных номеров"
+# -------------------------
+
+class AlreadyLogoutHTTPException(NabronirovalHTTPException) :
+    status_code = 401
+    detail = "Вы не аутентифицированы"
+
+class InternalServerErrorHTTPException(NabronirovalHTTPException):
+    status_code = 500
+    detail = "На стороне сервера произошла непредвиденная ошибка"

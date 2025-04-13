@@ -1,16 +1,20 @@
 services:
   booking_back_service:
     container_name: booking_back
+    volumes:
+      - shared_images:/app/src/static/images
     build:
       context: .  
-    # ports:
-    #   - "7777:8000"
+    ports:
+      - "7777:8000"
     networks:
       - myNetwork  
     env_file:
       - ".env"    
   booking_celery_worker_service:
     container_name: booking_celery_worker
+    volumes:
+      - shared_images:/app/src/static/images
     build:
       context: .  
     networks:
@@ -31,3 +35,6 @@ services:
 networks:
   myNetwork:
     external: true
+
+volumes:
+  shared_images:

@@ -21,8 +21,6 @@ class UsersService(BaseService):
         new_user_data = UserAdd(
             email=data.email,
             hashedpassword=hashedpassword,
-            name=data.name,
-            nickname=data.nickname,
         )
         return await self.db.users.add(new_user_data)
 

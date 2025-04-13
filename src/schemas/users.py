@@ -1,24 +1,27 @@
-from pydantic import BaseModel, EmailStr
+from src.exceptions.exceptions import TooShortPasswordHTTPException, TooLongPasswordHTTPException
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserRequestAdd(BaseModel):
-    email: EmailStr
-    name: str
-    nickname: str
+    email: EmailStr 
     password: str
 
+    @field_validator("password")
+    @classmethod
+    def password_is_not_empty(cls, value: str) : 
+        if not value.strip() or len(value.strip()) < 12:
+            raise TooShortPasswordHTTPException
+        if len(value.strip()) > 32 :
+            raise TooLongPasswordHTTPException
+        return value
 
 class UserAdd(BaseModel):
     email: EmailStr
-    name: str
-    nickname: str
     hashedpassword: str
 
 
 class User(BaseModel):
     id: int
-    name: str
-    nickname: str
     email: EmailStr
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Request, Response
 from src.exceptions.exceptions import (
     UserAlreadyExistsException,
     UserAlreadyExistsHTTPException,
@@ -7,7 +7,8 @@ from src.exceptions.exceptions import (
     WrongPasswordException,
     WrongPasswordHTTPException,
     ObjectNotFoundException,
-    EmailNotRegistratedHTTPException
+    EmailNotRegistratedHTTPException,
+    AlreadyLogoutHTTPException
 )
 from passlib.context import CryptContext
 from src.services.auth import UsersService
@@ -55,6 +56,8 @@ async def get_me(data: UserIdDep, db: DBDep):
 
 
 @router.post("/logout")
-async def logout_user(response: Response):
-    response.delete_cookie("access_token")
-    return {"status": "OK"}
+async def logout_user(response: Response, request: Request):
+    if request.cookies.get("access_token") :
+        response.delete_cookie("access_token")
+        return {"status": "OK"}
+    raise AlreadyLogoutHTTPException

@@ -1,7 +1,9 @@
+import logging
 from src.services.base import BaseService
-from src.exceptions.exceptions import check_date_to_after_date_from
+from src.exceptions.exceptions import check_date_to_after_date_from, HotelAlreadyExistsException, HotelAlreadyExistsHTTPException, ObjectNotFoundException, HotelNotFoundException
 from src.schemas.hotels import HotelPATCH
-
+from sqlalchemy.exc import IntegrityError
+from asyncpg.exceptions import UniqueViolationError
 
 class HotelSevice(BaseService):
     async def get_hotels_filtered_by_time(
@@ -27,16 +29,29 @@ class HotelSevice(BaseService):
         return await self.db.hotels.get_one(id=hotel_id)
 
     async def add_hotel(self, data):
-        hotel = await self.db.hotels.add(data=data)
+        try :
+            hotel = await self.db.hotels.add(data=data)
+        except IntegrityError as ex:
+            if isinstance(ex.orig.__cause__, UniqueViolationError):
+                logging.info(f"Ошибка {type(ex).__name__} обработана")
+                raise HotelAlreadyExistsException from ex
         await self.db.commit()
         return hotel
 
     async def delete_hotel(self, hotel_id):
+        try :
+            await self.db.hotels.get_one(id=hotel_id)
+        except ObjectNotFoundException as ex:
+            raise HotelNotFoundException from ex
         await self.db.hotels.delete(id=hotel_id)
         await self.db.commit()
 
     async def patch_and_put_hotel(
         self, hotel_id, data: HotelPATCH, is_patch: bool = False
     ):
+        try :
+            await self.db.hotels.get_one(id=hotel_id)
+        except ObjectNotFoundException as ex :
+            raise HotelNotFoundException from ex
         await self.db.hotels.edit(data=data, is_patch=is_patch, id=hotel_id)
         await self.db.commit()
