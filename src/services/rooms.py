@@ -10,6 +10,7 @@ from src.exceptions.exceptions import (
     HotelNotFoundException,
     RoomHasBookingsError,
     OutOfRangeException,
+    ObjectHasDepsException
 )
 from src.schemas.rooms import (
     RoomAddRequest,
@@ -56,6 +57,7 @@ class RoomsService(BaseService):
             if isinstance(ex.orig.__cause__, ForeignKeyViolationError):
                 logging.info(f"Ошибка {type(ex).__name__} обработана")
                 raise UslugiNotFoundException from ex
+        return room_data
 
     async def patch_room_with_rels(
         self, hotel_id: int, room_id: int, request: PATCHRoom
@@ -122,12 +124,8 @@ class RoomsService(BaseService):
             raise RoomNotFoundException from ex
         try:
             await self.db.rooms.delete(id=room_id)
-        except IntegrityError as ex:
-            if isinstance(ex.orig.__cause__, ForeignKeyViolationError):
-                logging.info(f"Ошибка {type(ex).__name__} обработана")
-                raise RoomHasBookingsError from ex
-            else:
-                logging.exception(ex)
+        except ObjectHasDepsException as ex:
+            raise RoomHasBookingsError from ex
         except DBAPIError as ex:
             if isinstance(ex.orig.__cause__, DataError):
                 raise OutOfRangeException

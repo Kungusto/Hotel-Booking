@@ -1,6 +1,15 @@
 import logging
 from src.services.base import BaseService
-from src.exceptions.exceptions import check_date_to_after_date_from, HotelAlreadyExistsException, HotelAlreadyExistsHTTPException, ObjectNotFoundException, HotelNotFoundException
+from src.exceptions.exceptions import (
+    check_date_to_after_date_from, 
+    HotelAlreadyExistsException,
+    HotelAlreadyExistsHTTPException,
+    ObjectNotFoundException,
+    HotelNotFoundException,
+    ObjectHasDepsException,
+    ObjectNotFoundHTTPException,
+    HotelHasRoomsException
+)
 from src.schemas.hotels import HotelPATCH
 from sqlalchemy.exc import IntegrityError
 from asyncpg.exceptions import UniqueViolationError
@@ -43,7 +52,10 @@ class HotelSevice(BaseService):
             await self.db.hotels.get_one(id=hotel_id)
         except ObjectNotFoundException as ex:
             raise HotelNotFoundException from ex
-        await self.db.hotels.delete(id=hotel_id)
+        try :
+            await self.db.hotels.delete(id=hotel_id)
+        except ObjectHasDepsException as ex :
+            raise HotelHasRoomsException from ex
         await self.db.commit()
 
     async def patch_and_put_hotel(

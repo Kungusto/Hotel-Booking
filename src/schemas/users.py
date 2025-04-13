@@ -10,9 +10,9 @@ class UserRequestAdd(BaseModel):
     @classmethod
     def password_is_not_empty(cls, value: str) : 
         if not value.strip() or len(value.strip()) < 12:
-            raise TooShortPasswordHTTPException
+            raise TooShortPasswordHTTPException # Кастомные ошибки для HTTP-ответа
         if len(value.strip()) > 32 :
-            raise TooLongPasswordHTTPException
+            raise TooLongPasswordHTTPException # Кастомные ошибки для HTTP-ответа
         return value
 
 class UserAdd(BaseModel):

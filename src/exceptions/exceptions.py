@@ -68,6 +68,15 @@ class NoChangesException(NabronirovalException):
 class OutOfRangeException(NabronirovalException):
     detail = "Длина ввода превышает допустимое значение"
 
+class WrongFormatFileException(NabronirovalException) :
+    detail = "Файл с этим расширением не поддерживается"
+
+class HotelHasRoomsException(NabronirovalException) :
+    detail = "Отель нельзя удалить, т.к. он имеет номера которые могут быть забронированы"
+
+class ObjectHasDepsException(NabronirovalException) :
+    detail = "На этот объект ссылаются другие"
+
 # ---------------------------------------------------------------------------------
 
 # - HTTP exceptions -
@@ -164,3 +173,17 @@ class InternalServerErrorHTTPException(NabronirovalHTTPException):
 class ExpiredTokenHTTPException(NabronirovalHTTPException) :
     status_code = 401
     detail = "Срок действия токена истек"
+
+class WrongFormatFileHTTPException(NabronirovalHTTPException) :
+    detail = "Поддерживаемые форматы: .jpg .jpeg .png .webp"
+
+class EmptyDataHTTPException(NabronirovalHTTPException) :
+    status_code = 422
+    detail = "Вы не ввели данные"
+
+class HotelHasRoomsHTTPException(NabronirovalHTTPException) :
+    detail = "Отель нельзя удалить, т.к. он имеет номера которые могут быть забронированы"
+
+class AlreadyAuthentificatedHTTPException(NabronirovalHTTPException) :
+    status_code = 403
+    detail = "Вы уже аутентифицированы"

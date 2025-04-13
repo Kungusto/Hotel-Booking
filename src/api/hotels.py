@@ -4,7 +4,9 @@ from src.exceptions.exceptions import (
     HotelNotFoundHTTPException,
     HotelAlreadyExistsHTTPException,
     HotelAlreadyExistsException,
-    HotelNotFoundException
+    HotelNotFoundException,
+    HotelHasRoomsHTTPException,
+    HotelHasRoomsException
 )
 from datetime import date
 from fastapi import Body, HTTPException, Query, APIRouter
@@ -107,10 +109,12 @@ async def edit_hotels_partialy(hotel_id: int, hotel_data: HotelPATCH, db: DBDep)
     return {"status": "OK"}
 
 
-@router.delete("{id_hotel}")
+@router.delete("/{id_hotel}")
 async def delete_hotel(id_hotel: int, db: DBDep):
     try :
         await HotelSevice(db).delete_hotel(hotel_id=id_hotel)
     except HotelNotFoundException as ex :
         raise HotelNotFoundHTTPException from ex
+    except HotelHasRoomsException as ex :
+        raise HotelHasRoomsHTTPException from ex
     return {"status": "OK"}

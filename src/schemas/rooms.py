@@ -6,7 +6,7 @@ class RoomAddRequest(BaseModel):
     title: str
     description: str | None = Field(None)
     price: int
-    quantity: int
+    quantity: int = Field(examples=[1])
     facilities_ids: list[int] = []
 
 

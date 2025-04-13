@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, field_validator
-from src.exceptions.exceptions import TooShortLocationHTTPException, TooShortTitleHTTPException
+from pydantic import BaseModel, Field, field_validator, model_validator
+from src.exceptions.exceptions import TooShortLocationHTTPException, TooShortTitleHTTPException, EmptyDataHTTPException
 
 class HotelAdd(BaseModel):
     title: str
@@ -22,11 +22,14 @@ class HotelAdd(BaseModel):
 class Hotel(HotelAdd):
     id: int
 
-
 class HotelPATCH(BaseModel):
     title: str | None = Field(None)
     location: str | None = Field(None)
 
+    @model_validator(mode="after")
+    def is_not_empty(self) :
+        if not (self.title or self.location) : 
+            raise EmptyDataHTTPException
 
 class HotelPUT(BaseModel):
     title: str

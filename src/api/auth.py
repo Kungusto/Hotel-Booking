@@ -10,7 +10,8 @@ from src.exceptions.exceptions import (
     EmailNotRegistratedHTTPException,
     AlreadyLogoutHTTPException,
     ExpiredTokenException,
-    ExpiredTokenHTTPException
+    ExpiredTokenHTTPException,
+    AlreadyAuthentificatedHTTPException
 )
 from passlib.context import CryptContext
 from src.services.auth import UsersService
@@ -34,8 +35,10 @@ async def register_user(data: UserRequestAdd, db: DBDep):
 
 
 @router.post("/login")
-async def login_user(data: UserLogin, response: Response, db: DBDep):
+async def login_user(data: UserLogin, response: Response, db: DBDep, request: Request):
     try:
+        if request.cookies.get("access_token") :
+            raise AlreadyAuthentificatedHTTPException 
         acces_token = await UsersService(db).login_user(data=data, response=response)
     except UserNotFoundException as ex:
         raise EmailNotRegistratedHTTPException from ex

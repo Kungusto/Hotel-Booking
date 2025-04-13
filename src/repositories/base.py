@@ -3,9 +3,9 @@ from typing import Sequence
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
 from src.repositories.mappers.base import DataMapper
-from src.exceptions.exceptions import ObjectNotFoundException, OutOfRangeException
-from sqlalchemy.exc import NoResultFound, DBAPIError
-from asyncpg.exceptions import DataError
+from src.exceptions.exceptions import ObjectNotFoundException, OutOfRangeException, ObjectHasDepsException
+from sqlalchemy.exc import NoResultFound, DBAPIError, IntegrityError
+from asyncpg.exceptions import DataError, ForeignKeyViolationError
 
 
 class BaseRepository:
@@ -87,6 +87,15 @@ class BaseRepository:
             .filter_by(**filter_by)
             .returning(self.model)
         )
-        models = await self.session.execute(edit_stmt)
+        try :
+            models = await self.session.execute(edit_stmt)
+        except IntegrityError as ex :
+            if isinstance(ex.orig.__cause__, ForeignKeyViolationError):
+                logging.info(f"Ошибка {type(ex).__name__} обработана")
+                raise ObjectHasDepsException from ex
+            else :
+                logging.error("Неизвестная ошибка")
+                logging.exception(ex)
+
         result = models.scalars().all()
         return [self.mapper.map_to_domain_entity(model) for model in result]

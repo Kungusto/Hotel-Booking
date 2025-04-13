@@ -21,6 +21,7 @@ from src.schemas.rooms import (
     RoomAddRequest,
     PUTRoom,
     PATCHRoomRequest,
+    Room
 )
 from src.services.rooms import RoomsService
 from src.api.dependencies import DBDep
@@ -55,19 +56,19 @@ async def create_room(
     db: DBDep, hotel_id: int = Query(), data: RoomAddRequest = Body()
 ):
     try:
-        await RoomsService(db).add_room_with_rels(hotel_id=hotel_id, data=data)
+        room_data = await RoomsService(db).add_room_with_rels(hotel_id=hotel_id, data=data)
     except UslugiNotFoundException as ex:
         raise UslugiNotFoundHTTPException from ex
     except OutOfRangeException as ex:
         raise OutOfRangeHTTPException from ex
-    except HotelNotFoundException as ex :
+    except HotelNotFoundException as ex:
         raise HotelNotFoundHTTPException from ex
     except Exception as ex:
         logging.error(f"!! НЕПРЕДВИДЕННАЯ Ошибка: {type(ex).__name__}")
         logging.exception(ex)
         raise InternalServerErrorHTTPException from ex
     await db.commit()
-    return {"status": "OK", "data": data}
+    return {"status": "OK", "data": {"id": room_data.id,  **data.model_dump()}}
 
 
 @router.get("/{hotel_id}/rooms/{room_id}")
