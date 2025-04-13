@@ -65,9 +65,7 @@ class RoomsService(BaseService):
         except ObjectNotFoundException as ex:
             raise HotelNotFoundException from ex
         try:
-            logging.debug("2!!!!!!!!!!!!!!")
             await self.db.rooms.get_one(id=room_id)
-            logging.debug("2!!!!!!!!!!!!!!")
         except ObjectNotFoundException as ex:
             raise RoomNotFoundException from ex
         _room_data_dict = request.model_dump(exclude_unset=True)
