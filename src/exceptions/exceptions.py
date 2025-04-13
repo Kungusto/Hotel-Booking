@@ -29,6 +29,10 @@ class UslugiNotFoundException(ObjectNotFoundException):
 class UserNotFoundException(ObjectNotFoundException):
     detail = "Пользователь не найден"
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 # --------------
 
 
@@ -43,8 +47,11 @@ class AllRoomsAreBookedException(NabronirovalException):
 class UserAlreadyExistsException(NabronirovalException):
     detail = "Пользователь уже существует"
 
+<<<<<<< HEAD
 class HotelAlreadyExistsException(NabronirovalException) :
     detail = "Указанный отель уже существует, либо указан не тот адрес"
+=======
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 
 class DepartureBeforeArrivalException(NabronirovalException):
     detail = "Дата выезда раньше даты заезда"
@@ -66,9 +73,13 @@ class NoChangesException(NabronirovalException):
 class OutOfRangeException(NabronirovalException):
     detail = "Длина ввода превышает допустимое значение"
 
+<<<<<<< HEAD
 # ---------------------------------------------------------------------------------
 
 # - HTTP exceptions -
+=======
+
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 class NabronirovalHTTPException(HTTPException):
     detail = None
     status_code = 400
@@ -100,11 +111,17 @@ class UslugiNotFoundHTTPException(ObjectNotFoundHTTPException):
 
 class UserNotFoundHTTPException(ObjectNotFoundHTTPException):
     detail = "Пользователь не найден"
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 # -------------------------
 
 class EmailNotRegistratedHTTPException(NabronirovalHTTPException) : 
     detail = "Этот E-mail не зарегестрирован"
 
+<<<<<<< HEAD
 
 # ------------------------- Валидация
 class EmptyTitleFacility(NabronirovalHTTPException) :
@@ -134,18 +151,37 @@ class TooShortLocationHTTPException(NabronirovalHTTPException) :
 class HotelAlreadyExistsHTTPException(NabronirovalHTTPException) :
     status_code = 409
     detail = "Такой отель уже существует, либо вы указали не тот адрес"
+=======
+class OutOfRangeHTTPException(NabronirovalHTTPException):
+    detail = "Длина ввода превышает допустимое значение"
+
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 
 class RoomHasBookingsHTTPException(NabronirovalHTTPException):
     detail = "На номер уже существуют бронирования!"
 
+<<<<<<< HEAD
+=======
+
+class InternalServerErrorHTTPException(NabronirovalHTTPException):
+    status_code = 500
+    detail = "На стороне сервера произошла непредвиденная ошибка"
+
+
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 class UserAlreadyExistsHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "Пользователь с этим email уже существует"
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
 class WrongPasswordHTTPException(NabronirovalHTTPException):
     status_code = 401
     detail = "Неверный пароль"
 
+<<<<<<< HEAD
 class AllRoomsAreBookedHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "На данный момент нет свободных номеров"
@@ -158,3 +194,9 @@ class AlreadyLogoutHTTPException(NabronirovalHTTPException) :
 class InternalServerErrorHTTPException(NabronirovalHTTPException):
     status_code = 500
     detail = "На стороне сервера произошла непредвиденная ошибка"
+=======
+
+class AllRoomsAreBookedHTTPException(NabronirovalHTTPException):
+    status_code = 409
+    detail = "На данный момент нет свободных номеров"
+>>>>>>> fa286a60a0dac023cb8d2d27af27892f5f4566db
