@@ -8,7 +8,9 @@ from src.exceptions.exceptions import (
     WrongPasswordHTTPException,
     ObjectNotFoundException,
     EmailNotRegistratedHTTPException,
-    AlreadyLogoutHTTPException
+    AlreadyLogoutHTTPException,
+    ExpiredTokenException,
+    ExpiredTokenHTTPException
 )
 from passlib.context import CryptContext
 from src.services.auth import UsersService
@@ -52,6 +54,8 @@ async def get_me(data: UserIdDep, db: DBDep):
         raise UserNotFoundHTTPException from ex
     except WrongPasswordException as ex:
         raise WrongPasswordHTTPException from ex
+    except ExpiredTokenException as ex :
+        raise ExpiredTokenHTTPException from ex
     return user
 
 

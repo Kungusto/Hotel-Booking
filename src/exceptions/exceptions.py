@@ -31,6 +31,8 @@ class UserNotFoundException(ObjectNotFoundException):
 
 # --------------
 
+class ExpiredTokenException(NabronirovalException) :
+    detail = "Срок действия токена истек"
 
 class WrongPasswordException(NabronirovalException):
     detail = "Неверный пароль"
@@ -158,3 +160,6 @@ class AlreadyLogoutHTTPException(NabronirovalHTTPException) :
 class InternalServerErrorHTTPException(NabronirovalHTTPException):
     status_code = 500
     detail = "На стороне сервера произошла непредвиденная ошибка"
+
+class ExpiredTokenHTTPException(NabronirovalHTTPException) :
+    detail = "Срок действия токена истек"

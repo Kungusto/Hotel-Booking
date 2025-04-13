@@ -5,11 +5,13 @@ from src.exceptions.exceptions import (
     ObjectNotFoundException,
     UserNotFoundException,
     WrongPasswordException,
+    ExpiredTokenException
 )
 from src.services.base import BaseService
 from passlib.context import CryptContext
 from src.config import settings
 from src.schemas.users import UserAdd
+from jwt.exceptions import ExpiredSignatureError
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -64,6 +66,9 @@ class AuthService(BaseService):
         return self.pwd_context.verify(plain_password, hashed_password)
 
     def decode_token(self, token: str) -> dict:
-        return jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
+        try :
+            return jwt.decode(
+                token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+            )
+        except ExpiredSignatureError as ex :
+            raise ExpiredTokenException from ex

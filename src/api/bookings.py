@@ -6,6 +6,8 @@ from src.exceptions.exceptions import (
     DepartureBeforeArrivalException,
     DepartureBeforeArrivalHTTPException,
     AllRoomsAreBookedHTTPException,
+    ExpiredTokenException,
+    ExpiredTokenHTTPException
 )
 from src.services.bookings import BookingService
 from fastapi import APIRouter
@@ -26,13 +28,18 @@ async def create_booking(data: AddBookingsFromUser, db: DBDep, user_id: GetUserI
         raise RoomNotFoundHTTPException from ex
     except AllRoomsAreBookedException as ex:
         raise AllRoomsAreBookedHTTPException from ex
+    except ExpiredTokenException as ex :
+        raise ExpiredTokenHTTPException from ex
     await db.commit()
     return {"status": "OK", "data": bookings_returned}
 
 
 @router.get("/me")
 async def get_my_bookings(user_id: GetUserId, db: DBDep):
-    return await BookingService(db).get_my_bookigns(user_id=user_id)
+    try :
+        return await BookingService(db).get_my_bookigns(user_id=user_id)
+    except ExpiredTokenException as ex :
+        raise ExpiredTokenHTTPException from ex
 
 
 @router.get("")
