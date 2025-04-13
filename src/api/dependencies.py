@@ -4,7 +4,7 @@ from typing import Annotated
 from src.utils.dbmanager import DBManager
 from src.services.auth import AuthService
 from src.database import async_session_maker
-
+from src.exceptions.exceptions import ExpiredTokenHTTPException, ExpiredTokenException
 
 class PaginationParams(BaseModel):
     page: Annotated[
@@ -25,10 +25,13 @@ def get_token(request: Request) -> str:
 
 
 def get_current_user_id(request: Request, token=Depends(get_token)):
-    cookies = request.cookies
-    token = cookies.get("access_token", None)
-    data = AuthService().decode_token(token)
-    return data
+    try :
+        cookies = request.cookies
+        token = cookies.get("access_token", None)
+        data = AuthService().decode_token(token)
+        return data
+    except ExpiredTokenException as ex :
+        raise ExpiredTokenHTTPException from ex
 
 
 UserIdDep = Annotated[int, Depends(get_current_user_id)]
