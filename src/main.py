@@ -18,7 +18,7 @@ from src.api.images import router as router_images
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 @asynccontextmanager

@@ -57,17 +57,23 @@ class RoomsService(BaseService):
     async def patch_room_with_rels(
         self, hotel_id: int, room_id: int, request: PATCHRoom
     ) -> None:
+        logging.debug(request)
         try:
+            logging.debug("1!!!!!!!!!!!!!!!")
             await self.db.hotels.get_one(id=hotel_id)
+            logging.debug("1!!!!!!!!!!!!!!!")
         except ObjectNotFoundException as ex:
             raise HotelNotFoundException from ex
         try:
+            logging.debug("2!!!!!!!!!!!!!!")
             await self.db.rooms.get_one(id=room_id)
+            logging.debug("2!!!!!!!!!!!!!!")
         except ObjectNotFoundException as ex:
             raise RoomNotFoundException from ex
         _room_data_dict = request.model_dump(exclude_unset=True)
-        data = PATCHRoomAdd(**_room_data_dict)
-        await self.db.rooms.edit(data, is_patch=True, id=room_id)
+        if not (len(_room_data_dict) == 1 and "facilities_ids" in _room_data_dict) :
+            data = PATCHRoomAdd(**_room_data_dict)
+            await self.db.rooms.edit(data, is_patch=True, id=room_id)
         if "facilities_ids" in _room_data_dict:
             try:
                 await self.db.facilities.set_room_facilities(
@@ -89,8 +95,10 @@ class RoomsService(BaseService):
         except ObjectNotFoundException as ex:
             raise RoomNotFoundException from ex
         _room_data_dict = request.model_dump()
-        data = PUTRoomAdd(**_room_data_dict)
-        await self.db.rooms.edit(data, is_patch=True, id=room_id)
+        print(_room_data_dict, end="\n"*5)
+        if _room_data_dict :
+            data = PUTRoomAdd(**_room_data_dict)
+            await self.db.rooms.edit(data, is_patch=True, id=room_id)
         if "facilities_ids" in _room_data_dict:
             try:
                 await self.db.facilities.set_room_facilities(
