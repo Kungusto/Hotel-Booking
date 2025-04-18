@@ -14,3 +14,4 @@ deploy-job:
   stage: deploy  
   script:
     - docker compose up -f docker-compose-ci.yml -d
+
