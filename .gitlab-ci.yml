@@ -13,5 +13,5 @@ build-job:
 deploy-job:      
   stage: deploy  
   script:
-    - docker compose up -f docker-compose-ci.yml -d
+    - docker compose up --file docker-compose-ci.yml -d
 
