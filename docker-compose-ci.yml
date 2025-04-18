@@ -3,7 +3,7 @@ services:
     container_name: booking_back
     volumes:
       - shared_images:/app/src/static/images
-    images: booking_api_image:latest
+    image: booking_api_image:latest
     ports:
       - "7777:8000"
     networks:
@@ -12,13 +12,13 @@ services:
     container_name: booking_celery_worker
     volumes:
       - shared_images:/app/src/static/images
-    images: booking_api_image:latest
+    image: booking_api_image:latest
     networks:
       - myNetwork     
     command: "celery --app=src.tasks.celery_app:celery_instance worker -l INFO --pool=solo" 
   booking_celery_beat_service:
     container_name: booking_celery_beat
-    images: booking_api_image:latest
+    image: booking_api_image:latest
     networks:
       - myNetwork
     command: "celery --app=src.tasks.celery_app:celery_instance beat -l INFO"
