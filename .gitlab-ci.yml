@@ -1,13 +1,16 @@
-stages:          # List of stages for jobs, and their order of execution
+stages:   
   - build
   - deploy
 
-build-job:       # This job runs in the build stage, which runs first.
+build-job:
+  before_script: 
+    - cp ${MY_ENV} .env
+    - cp ${ENV_TEST} .test-env
   stage: build
   script:
     - docker build -t booking-api-image .
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+deploy-job:      
+  stage: deploy  
   script:
-    - docker compose up -d
+    - docker compose up -f docker-compose-ci.yml -d
