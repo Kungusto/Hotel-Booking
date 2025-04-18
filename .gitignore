@@ -2,7 +2,7 @@ venv
 .venv
 .idea 
 __pycache__
-# .env
+.env
 .codegpt
 i.webp
 env.py

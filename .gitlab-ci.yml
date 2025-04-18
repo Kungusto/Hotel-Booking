@@ -4,8 +4,8 @@ stages:
 
 build-job:
   before_script: 
-    - cp ${MY_ENV} .env
-    - cp ${ENV_TEST} .test-env
+    - copy ${MY_ENV} .env
+    - copy ${ENV_TEST} .test-env
   stage: build
   script:
     - docker build -t booking-api-image .
